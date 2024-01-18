@@ -7,6 +7,10 @@ function Button({ onClick, children }) {
 }
 
 function Statistics({ good, neutral, bad }) {
+    const totalVotes = good + neutral + bad;
+    const averageScore = (good * 1 + bad * -1) / totalVotes || 0;
+    const positivePercentage = (good / totalVotes) * 100 || 0;
+
     return (
         <>
             <h2>Statistics</h2>
@@ -15,6 +19,9 @@ function Statistics({ good, neutral, bad }) {
                 <li>Neutral: {neutral}</li>
                 <li>Bad: {bad}</li>
             </ul>
+            <p>Total votes : {totalVotes}</p>
+            <p>Average score: {averageScore}</p>
+            <p>Positive percentage: {positivePercentage}%</p>
         </>
     );
 }
