@@ -6,10 +6,17 @@ function Button({ onClick, children }) {
     return <button onClick={onClick}>{children}</button>;
 }
 
-function Statistics({ good, neutral, bad }) {
-    const surveyEmpty = good === 0 && neutral === 0 && bad === 0;
+function StatisticsLine({ data, children, isPercentage }) {
+    return (
+        <p>
+            {children}: {data} {isPercentage && "%"}
+        </p>
+    );
+}
 
-    if (surveyEmpty) {
+function Statistics({ good, neutral, bad }) {
+    const surveyIsEmpty = good === 0 && neutral === 0 && bad === 0;
+    if (surveyIsEmpty) {
         return (
             <>
                 <h2>Statistics</h2>
@@ -18,28 +25,42 @@ function Statistics({ good, neutral, bad }) {
         );
     }
 
-    const totalVotes = good + neutral + bad;
-    const averageScore = (good * 1 + bad * -1) / totalVotes || 0;
-    const positivePercentage = (good / totalVotes) * 100 || 0;
+    const totalVotes = calculateTotalVotes();
+    const averageScore = calculateAverageScore();
+    const positivePercentage = calculatePositivePercentage();
 
     return (
         <>
             <h2>Statistics</h2>
-            <ul>
-                <li>Good: {good}</li>
-                <li>Neutral: {neutral}</li>
-                <li>Bad: {bad}</li>
-            </ul>
 
-            <p>Total votes : {totalVotes}</p>
-            <p>Average score: {averageScore}</p>
-            <p>Positive percentage: {positivePercentage}%</p>
+            <StatisticsLine data={good}>Good</StatisticsLine>
+            <StatisticsLine data={neutral}>Neutral</StatisticsLine>
+            <StatisticsLine data={bad}>Bad</StatisticsLine>
+
+            <StatisticsLine data={totalVotes}>Total votes</StatisticsLine>
+            <StatisticsLine data={averageScore}>Average score</StatisticsLine>
+            <StatisticsLine data={positivePercentage} isPercentage={true}>
+                Positive percentage
+            </StatisticsLine>
         </>
     );
+
+    function calculateTotalVotes() {
+        return good + neutral + bad;
+    }
+
+    function calculatePositivePercentage() {
+        return ((good / totalVotes) * 100 || 0).toFixed();
+    }
+
+    function calculateAverageScore() {
+        const average = (good * 1 + bad * -1) / totalVotes || 0;
+        if (average < 0) return 0;
+        return average.toFixed(2);
+    }
 }
 
 function App() {
-    // save clicks of each button to its own state
     const [good, setGood] = useState(0);
     const [neutral, setNeutral] = useState(0);
     const [bad, setBad] = useState(0);
