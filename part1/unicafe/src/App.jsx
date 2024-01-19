@@ -9,8 +9,9 @@ function Button({ onClick, children }) {
 function StatisticsLine({ data, children, isPercentage }) {
     return (
         <tr>
+            <td>{children}</td>
             <td>
-                {children} {data}
+                {data}
                 {isPercentage && "%"}
             </td>
         </tr>
