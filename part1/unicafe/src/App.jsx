@@ -56,7 +56,7 @@ function Statistics({ good, neutral, bad }) {
     function calculateAverageScore() {
         const average = (good * 1 + bad * -1) / totalVotes || 0;
         if (average < 0) return 0;
-        return average.toFixed(2);
+        return (average * 10).toFixed(2);
     }
 }
 
