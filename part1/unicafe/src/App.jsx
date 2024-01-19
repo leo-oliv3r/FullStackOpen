@@ -3,7 +3,15 @@
 import { useState } from "react";
 
 function Button({ onClick, children }) {
-    return <button onClick={onClick}>{children}</button>;
+    return (
+        <button
+            onClick={onClick}
+            style={{
+                cursor: "pointer",
+            }}>
+            {children}
+        </button>
+    );
 }
 
 function StatisticsLine({ data, children, isPercentage }) {
@@ -88,10 +96,16 @@ function App() {
     return (
         <div style={{ fontFamily: "sans-serif" }}>
             <h1>Give feedback</h1>
-            <Button onClick={() => setGood((good) => good + 1)}>Good</Button>
-            <Button onClick={() => setNeutral((neutral) => neutral + 1)}>Neutral</Button>
-            <Button onClick={() => setBad((bad) => bad + 1)}>Bad</Button>
-            <Button onClick={clearAll}>Clear</Button>
+            <div
+                style={{
+                    display: "flex",
+                    gap: "1rem",
+                }}>
+                <Button onClick={() => setGood((good) => good + 1)}>Good</Button>
+                <Button onClick={() => setNeutral((neutral) => neutral + 1)}>Neutral</Button>
+                <Button onClick={() => setBad((bad) => bad + 1)}>Bad</Button>
+                <Button onClick={clearAll}>Clear</Button>
+            </div>
 
             <Statistics good={good} neutral={neutral} bad={bad} />
         </div>
