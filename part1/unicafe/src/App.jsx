@@ -8,9 +8,12 @@ function Button({ onClick, children }) {
 
 function StatisticsLine({ data, children, isPercentage }) {
     return (
-        <p>
-            {children}: {data} {isPercentage && "%"}
-        </p>
+        <tr>
+            <td>
+                {children} {data}
+                {isPercentage && "%"}
+            </td>
+        </tr>
     );
 }
 
@@ -19,8 +22,7 @@ function Statistics({ good, neutral, bad }) {
     if (surveyIsEmpty) {
         return (
             <>
-                <h2>Statistics</h2>
-                <p>No feedback given</p>
+                <h2>No feedback given yet</h2>
             </>
         );
     }
@@ -31,17 +33,28 @@ function Statistics({ good, neutral, bad }) {
 
     return (
         <>
-            <h2>Statistics</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <td
+                            colSpan={2}
+                            style={{ textAlign: "center", fontSize: "1.5rem", fontWeight: "bold" }}>
+                            Statistics
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <StatisticsLine data={good}>Good</StatisticsLine>
+                    <StatisticsLine data={neutral}>Neutral</StatisticsLine>
+                    <StatisticsLine data={bad}>Bad</StatisticsLine>
 
-            <StatisticsLine data={good}>Good</StatisticsLine>
-            <StatisticsLine data={neutral}>Neutral</StatisticsLine>
-            <StatisticsLine data={bad}>Bad</StatisticsLine>
-
-            <StatisticsLine data={totalVotes}>Total votes</StatisticsLine>
-            <StatisticsLine data={averageScore}>Average score</StatisticsLine>
-            <StatisticsLine data={positivePercentage} isPercentage={true}>
-                Positive percentage
-            </StatisticsLine>
+                    <StatisticsLine data={totalVotes}>Total votes</StatisticsLine>
+                    <StatisticsLine data={averageScore}>Average score</StatisticsLine>
+                    <StatisticsLine data={positivePercentage} isPercentage={true}>
+                        Positive percentage
+                    </StatisticsLine>
+                </tbody>
+            </table>
         </>
     );
 
@@ -72,7 +85,7 @@ function App() {
     };
 
     return (
-        <>
+        <div style={{ fontFamily: "sans-serif" }}>
             <h1>Give feedback</h1>
             <Button onClick={() => setGood((good) => good + 1)}>Good</Button>
             <Button onClick={() => setNeutral((neutral) => neutral + 1)}>Neutral</Button>
@@ -80,7 +93,7 @@ function App() {
             <Button onClick={clearAll}>Clear</Button>
 
             <Statistics good={good} neutral={neutral} bad={bad} />
-        </>
+        </div>
     );
 }
 
