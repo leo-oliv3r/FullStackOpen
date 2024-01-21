@@ -21,13 +21,22 @@ function App() {
         newPoints[selected] += 1;
         setPoints(newPoints);
     };
+    const mostVotedAnecdote = (() => {
+        const highestScore = Math.max(...points);
+        const indexOfHighestScore = points.indexOf(highestScore);
+        return anecdotes[indexOfHighestScore];
+    })();
 
     return (
         <div style={{ fontFamily: "sans-serif" }}>
+            <h1>Anecdote of the day</h1>
             <em>{`"${anecdotes[selected]}"`}</em>
             <div>This anecdote has {points[selected]} votes</div>
             <Button onClick={handleNextAnecdote}>Show me another</Button>
             <Button onClick={handleVote}>Vote</Button>
+
+            <h2>Most voted anecdote</h2>
+            <em>{`"${mostVotedAnecdote}"`}</em>
         </div>
     );
 }
