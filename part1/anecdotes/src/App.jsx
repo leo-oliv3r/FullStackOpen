@@ -13,6 +13,7 @@ function Button({ onClick, children }) {
 function App() {
     const [selected, setSelected] = useState(0);
     const [points, setPoints] = useState(new Array(anecdotes.length).fill(0));
+    const [mostVoted, setMostVoted] = useState("");
 
     const getRandomIndex = (array) => Math.floor(Math.random() * array.length);
     const handleNextAnecdote = () => setSelected(getRandomIndex(anecdotes));
@@ -20,12 +21,13 @@ function App() {
         const newPoints = [...points];
         newPoints[selected] += 1;
         setPoints(newPoints);
+
+        const highestScore = Math.max(...newPoints);
+        const indexOfHighestScore = newPoints.indexOf(highestScore);
+        if (mostVoted !== anecdotes[indexOfHighestScore]) {
+            setMostVoted(anecdotes[indexOfHighestScore]);
+        }
     };
-    const mostVotedAnecdote = (() => {
-        const highestScore = Math.max(...points);
-        const indexOfHighestScore = points.indexOf(highestScore);
-        return anecdotes[indexOfHighestScore];
-    })();
 
     return (
         <div style={{ fontFamily: "sans-serif" }}>
@@ -36,7 +38,7 @@ function App() {
             <Button onClick={handleVote}>Vote</Button>
 
             <h2>Most voted anecdote</h2>
-            <em>{`"${mostVotedAnecdote}"`}</em>
+            <em>{mostVoted || "No votes yet"}</em>
         </div>
     );
 }
