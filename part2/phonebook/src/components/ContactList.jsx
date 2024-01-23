@@ -10,11 +10,15 @@ function Contact({ name, phoneNumber }) {
     );
 }
 
-function ContactList({ persons }) {
+function ContactList({ persons, searchWord }) {
+    const personsToRender = searchWord
+        ? persons.filter((person) => person.name.toLowerCase().includes(searchWord.toLowerCase()))
+        : persons;
+
     return (
         <>
-            <h1>Numbers</h1>
-            {persons.map((person) => (
+            <h1>Contacts</h1>
+            {personsToRender.map((person) => (
                 <Contact key={person.name} name={person.name} phoneNumber={person.phoneNumber} />
             ))}
         </>

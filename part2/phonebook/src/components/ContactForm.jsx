@@ -18,26 +18,22 @@ function ContactForm({ setNewName, newName, setPersons, persons, newNumber, setN
     return (
         <>
             <form onSubmit={handleSubmit}>
+                <label htmlFor="new-name">Name</label>
                 <div>
-                    <label htmlFor="new-name">
-                        Name:
-                        <input
-                            id="new-name"
-                            value={newName}
-                            onChange={(e) => setNewName(e.target.value)}
-                        />
-                    </label>
+                    <input
+                        id="new-name"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                    />
                 </div>
 
+                <label htmlFor="new-number">Number</label>
                 <div>
-                    <label htmlFor="new-number">
-                        Number:
-                        <input
-                            id="new-number"
-                            value={newNumber}
-                            onChange={(e) => setNewNumber(e.target.value)}
-                        />
-                    </label>
+                    <input
+                        id="new-number"
+                        value={newNumber}
+                        onChange={(e) => setNewNumber(e.target.value)}
+                    />
                 </div>
 
                 <button type="submit">Add Contact</button>
