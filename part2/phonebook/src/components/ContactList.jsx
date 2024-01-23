@@ -3,8 +3,9 @@
 function Contact({ name, phoneNumber }) {
     return (
         <>
-            <div style={{ textTransform: "capitalize" }}>{name}</div>
-            <div>{phoneNumber}</div>
+            <div style={{ textTransform: "capitalize" }}>
+                {name} - {phoneNumber}
+            </div>
         </>
     );
 }
