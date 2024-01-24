@@ -1,15 +1,22 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import Title from "./components/Title";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
 import SearchBar from "./components/SearchBar";
 
 function App() {
-    const [persons, setPersons] = useState([{ name: "Arto Hellas", phoneNumber: "999221232" }]);
+    const [persons, setPersons] = useState([]);
     const [newName, setNewName] = useState("");
     const [newNumber, setNewNumber] = useState("");
     const [searchWord, setSearchWord] = useState("");
+
+    useEffect(() => {
+        axios.get("http://localhost:3001/persons").then((res) => {
+            setPersons(res.data);
+        });
+    }, []);
 
     return (
         <div style={{ fontFamily: "sans-serif" }}>
