@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
 import { useEffect, useState } from "react";
+import noteService from "./services/notes";
 import Title from "./components/Title";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
@@ -13,9 +13,7 @@ function App() {
     const [searchWord, setSearchWord] = useState("");
 
     useEffect(() => {
-        axios.get("http://localhost:3001/persons").then((res) => {
-            setPersons(res.data);
-        });
+        noteService.getAllPersons().then((res) => setPersons(res));
     }, []);
 
     return (
