@@ -5,12 +5,14 @@ import Title from "./components/Title";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
 import SearchBar from "./components/SearchBar";
+import Notification from "./components/Notification";
 
 function App() {
     const [persons, setPersons] = useState([]);
     const [newName, setNewName] = useState("");
     const [newNumber, setNewNumber] = useState("");
     const [searchWord, setSearchWord] = useState("");
+    const [notificationMessage, setNewNotification] = useState({ message: "", type: "" });
 
     useEffect(() => {
         phonebookService.getAllPersons().then((res) => setPersons(res));
@@ -29,12 +31,16 @@ function App() {
                 setPersons={setPersons}
                 newNumber={newNumber}
                 setNewNumber={setNewNumber}
+                setNewNotification={setNewNotification}
             ></ContactForm>
+
+            <Notification notificationMessage={notificationMessage} />
 
             <ContactList
                 persons={persons}
                 setPersons={setPersons}
                 searchWord={searchWord}
+                setNewNotification={setNewNotification}
             ></ContactList>
         </div>
     );

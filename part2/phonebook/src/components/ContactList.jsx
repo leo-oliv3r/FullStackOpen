@@ -13,17 +13,17 @@ function Contact({ name, phoneNumber }) {
     );
 }
 
-function ContactList({ persons, setPersons, searchWord }) {
+function ContactList({ persons, setPersons, setNewNotification, searchWord }) {
     const personsToRender = searchWord
         ? persons.filter((person) => person.name.toLowerCase().includes(searchWord.toLowerCase()))
         : persons;
 
     const handleClick = (person) => {
-        const confirmed = confirm(`Confirm delete of ${person.name}?`);
+        const confirmed = confirm(`Confirm delete of ${person.name.toUpperCase()}?`);
 
         if (confirmed) {
             phonebookService.deleteContact(person.id).then(() => {
-                alert(`${person.name} deleted`);
+                setNewNotification({ message: `Contact ${person.name} deleted`, type: "deleted" });
                 const newPersons = persons.filter((current) => current.id !== person.id);
                 setPersons(newPersons);
             });

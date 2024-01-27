@@ -1,7 +1,15 @@
 /* eslint-disable react/prop-types */
 import phonebookService from "../services/phonebook";
 
-function ContactForm({ setNewName, newName, setPersons, persons, newNumber, setNewNumber }) {
+function ContactForm({
+    setNewName,
+    newName,
+    setPersons,
+    persons,
+    newNumber,
+    setNewNumber,
+    setNewNotification,
+}) {
     const nameAlreadyInUse = persons.find(
         (person) => person.name.toLowerCase() === newName.toLowerCase()
     );
@@ -12,12 +20,18 @@ function ContactForm({ setNewName, newName, setPersons, persons, newNumber, setN
         e.preventDefault();
 
         if (nameAlreadyInUse) {
-            alert(`Name "${newName}" is already added to phonebook`);
+            setNewNotification({
+                message: `Name "${newName}" is already on the phonebook`,
+                type: "warning",
+            });
             return;
         }
 
         if (phoneNumberAlreadyInUse) {
-            alert(`Number ${newNumber} is already added to phonebook`);
+            setNewNotification({
+                message: `Number ${newNumber} is already on the phonebook`,
+                type: "warning",
+            });
             return;
         }
 
@@ -25,9 +39,13 @@ function ContactForm({ setNewName, newName, setPersons, persons, newNumber, setN
             name: newName,
             phoneNumber: newNumber,
         });
-
         const newPersons = [...persons, newPerson];
+
         setPersons(newPersons);
+        setNewNotification({
+            message: `Contact "${newName} - ${newNumber}" created`,
+            type: "created",
+        });
         setNewName("");
         setNewNumber("");
     };
