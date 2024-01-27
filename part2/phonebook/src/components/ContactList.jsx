@@ -22,11 +22,24 @@ function ContactList({ persons, setPersons, setNewNotification, searchWord }) {
         const confirmed = confirm(`Confirm delete of ${person.name.toUpperCase()}?`);
 
         if (confirmed) {
-            phonebookService.deleteContact(person.id).then(() => {
-                setNewNotification({ message: `Contact ${person.name} deleted`, type: "deleted" });
-                const newPersons = persons.filter((current) => current.id !== person.id);
-                setPersons(newPersons);
-            });
+            phonebookService
+                .deleteContact(person.id)
+                .then(() => {
+                    setNewNotification({
+                        message: `Contact ${person.name} deleted`,
+                        type: "deleted",
+                    });
+                    const newPersons = persons.filter((current) => current.id !== person.id);
+                    setPersons(newPersons);
+                })
+                .catch(() => {
+                    setNewNotification({
+                        message: `Contact ${person.name} was already deleted on server`,
+                        type: "deleted",
+                    });
+
+                    phonebookService.getAllPersons().then((res) => setPersons(res));
+                });
         }
     };
 
