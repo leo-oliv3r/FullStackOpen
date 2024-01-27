@@ -1,15 +1,32 @@
 /* eslint-disable react/prop-types */
+import phonebookService from "../services/phonebook";
 
 function ContactForm({ setNewName, newName, setPersons, persons, newNumber, setNewNumber }) {
-    const handleSubmit = (e) => {
+    const nameAlreadyInUse = persons.find(
+        (person) => person.name.toLowerCase() === newName.toLowerCase()
+    );
+
+    const phoneNumberAlreadyInUse = persons.find((person) => person.phoneNumber === newNumber);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (persons.find((person) => person.name.toLowerCase() === newName.toLowerCase())) {
-            alert(`${newName} is already added to phonebook`);
+        if (nameAlreadyInUse) {
+            alert(`Name "${newName}" is already added to phonebook`);
             return;
         }
 
-        const newPersons = [...persons, { name: newName, phoneNumber: newNumber }];
+        if (phoneNumberAlreadyInUse) {
+            alert(`Number ${newNumber} is already added to phonebook`);
+            return;
+        }
+
+        const newPerson = await phonebookService.createContact({
+            name: newName,
+            phoneNumber: newNumber,
+        });
+
+        const newPersons = [...persons, newPerson];
         setPersons(newPersons);
         setNewName("");
         setNewNumber("");

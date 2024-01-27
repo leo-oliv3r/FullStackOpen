@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import noteService from "./services/notes";
+import phonebookService from "./services/phonebook";
 import Title from "./components/Title";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
@@ -13,7 +13,7 @@ function App() {
     const [searchWord, setSearchWord] = useState("");
 
     useEffect(() => {
-        noteService.getAllPersons().then((res) => setPersons(res));
+        phonebookService.getAllPersons().then((res) => setPersons(res));
     }, []);
 
     return (
