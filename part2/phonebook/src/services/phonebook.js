@@ -3,18 +3,22 @@ import axios from "axios";
 const BASE_URL = "http://localhost:3001/persons";
 
 async function getAllPersons() {
-    const res = await axios.get(BASE_URL);
-    return res.data;
+    return await axios.get(BASE_URL).then((res) => res.data);
 }
 
 async function createContact(contact) {
-    const response = await axios
+    const newContact = await axios
         .post("http://localhost:3001/persons", contact)
         .then((res) => res.data);
-    return response;
+    return newContact;
+}
+
+async function deleteContact(id) {
+    return await axios.delete(`${BASE_URL}/${id}`).then((res) => res.status);
 }
 
 export default {
     getAllPersons,
-    createContact
+    createContact,
+    deleteContact,
 };

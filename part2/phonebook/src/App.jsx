@@ -31,7 +31,11 @@ function App() {
                 setNewNumber={setNewNumber}
             ></ContactForm>
 
-            <ContactList persons={persons} searchWord={searchWord}></ContactList>
+            <ContactList
+                persons={persons}
+                setPersons={setPersons}
+                searchWord={searchWord}
+            ></ContactList>
         </div>
     );
 }
