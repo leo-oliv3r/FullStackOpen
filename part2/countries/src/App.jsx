@@ -34,7 +34,7 @@ function CountryList({ countries }) {
         return <Country country={countries[0]} detailed={true} />;
     }
 
-    return countries.map((country) => <p key={country.name.common}>{country.name.common}</p>);
+    return countries.map((country) => <Country key={country.name.common} country={country} />);
 }
 
 function Search({ children, onChange }) {
