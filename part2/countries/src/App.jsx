@@ -2,6 +2,14 @@
 import { useEffect, useState } from "react";
 import countriesService from "./services/countries";
 
+function Button({ onClick, children }) {
+    return (
+        <button style={{ marginTop: "10px" }} onClick={onClick}>
+            {children}
+        </button>
+    );
+}
+
 function Country({ country, detailed }) {
     if (detailed) {
         return (
@@ -25,7 +33,7 @@ function Country({ country, detailed }) {
     return <p>{country.name.common}</p>;
 }
 
-function CountryList({ countries }) {
+function CountryList({ countries, expandedCountries, setExpandedCountries }) {
     if (countries.length > 10) {
         return <p>Too many countries found, be more specific</p>;
     }
@@ -34,7 +42,16 @@ function CountryList({ countries }) {
         return <Country country={countries[0]} detailed={true} />;
     }
 
-    return countries.map((country) => <Country key={country.name.common} country={country} />);
+    return countries.map((country) => (
+        <div key={country.name.common} style={{ display: "grid", maxWidth: "200px" }}>
+            <Country country={country} detailed={expandedCountries.includes(country.name.common)} />
+            <Button
+                onClick={() => setExpandedCountries([...expandedCountries, country.name.common])}
+            >
+                Expand
+            </Button>
+        </div>
+    ));
 }
 
 function Search({ children, onChange }) {
@@ -49,6 +66,7 @@ function Search({ children, onChange }) {
 function App() {
     const [countries, setCountries] = useState(null);
     const [countriesToRender, setCountriesToRender] = useState([]);
+    const [expandedCountries, setExpandedCountries] = useState([]);
 
     useEffect(() => {
         countriesService.getAllCountries().then((res) => {
@@ -66,8 +84,13 @@ function App() {
 
     return (
         <div style={{ fontFamily: "sans-serif" }}>
+            {!countries && <div className="loader"></div>}
             {countries && <Search onChange={(e) => handleInputChange(e)}>Search country: </Search>}
-            <CountryList countries={countriesToRender}></CountryList>
+            <CountryList
+                countries={countriesToRender}
+                expandedCountries={expandedCountries}
+                setExpandedCountries={setExpandedCountries}
+            ></CountryList>
         </div>
     );
 }
