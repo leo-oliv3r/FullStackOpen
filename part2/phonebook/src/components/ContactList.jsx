@@ -49,7 +49,7 @@ function ContactList({ persons, setPersons, setNewNotification, searchWord }) {
 
             {personsToRender.map((person) => (
                 <div key={person.id}>
-                    <Contact name={person.name} phoneNumber={person.phoneNumber} />
+                    <Contact name={person.name} phoneNumber={person.number} />
                     <Button onClick={() => handleClick(person)}>Delete</Button>
                 </div>
             ))}

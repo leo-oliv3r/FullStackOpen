@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import phonebookService from "../services/phonebook";
+import { isNameInList, isNumberInList } from "../utils/utils";
 
 function ContactForm({
     setNewName,
@@ -10,16 +11,10 @@ function ContactForm({
     setNewNumber,
     setNewNotification,
 }) {
-    const nameAlreadyInUse = persons.find(
-        (person) => person.name.toLowerCase() === newName.toLowerCase()
-    );
-
-    const phoneNumberAlreadyInUse = persons.find((person) => person.phoneNumber === newNumber);
-
-    const handleSubmit = async (e) => {
+    async function handleSubmit(e) {
         e.preventDefault();
 
-        if (nameAlreadyInUse) {
+        if (isNameInList(newName, persons)) {
             setNewNotification({
                 message: `Name "${newName}" is already on the phonebook`,
                 type: "warning",
@@ -27,7 +22,7 @@ function ContactForm({
             return;
         }
 
-        if (phoneNumberAlreadyInUse) {
+        if (isNumberInList(newNumber, persons)) {
             setNewNotification({
                 message: `Number ${newNumber} is already on the phonebook`,
                 type: "warning",
@@ -35,20 +30,27 @@ function ContactForm({
             return;
         }
 
-        const newPerson = await phonebookService.createContact({
-            name: newName,
-            phoneNumber: newNumber,
-        });
-        const newPersons = [...persons, newPerson];
+        try {
+            const newPerson = await phonebookService.createContact({
+                name: newName,
+                phoneNumber: newNumber,
+            });
+            const newPersons = [...persons, newPerson];
 
-        setPersons(newPersons);
-        setNewNotification({
-            message: `Contact "${newName} - ${newNumber}" created`,
-            type: "created",
-        });
-        setNewName("");
-        setNewNumber("");
-    };
+            setPersons(newPersons);
+            setNewNotification({
+                message: `Contact "${newName} - ${newNumber}" created`,
+                type: "created",
+            });
+            setNewName("");
+            setNewNumber("");
+        } catch (error) {
+            setNewNotification({
+                message: `Error: ${error.response.data.error}`,
+                type: "warning",
+            });
+        }
+    }
 
     return (
         <>
