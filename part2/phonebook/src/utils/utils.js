@@ -3,7 +3,7 @@ function isNameInList(name, list) {
 }
 
 function isNumberInList(number, list) {
-    return list.find((item) => item.phoneNumber === number);
+    return list.find((item) => Number(item.phoneNumber) === Number(number));
 }
 
 export { isNameInList, isNumberInList };

@@ -33,11 +33,12 @@ function ContactForm({
         try {
             const newPerson = await phonebookService.createContact({
                 name: newName,
-                phoneNumber: newNumber,
+                number: newNumber,
             });
-            const newPersons = [...persons, newPerson];
 
+            const newPersons = [...persons, newPerson];
             setPersons(newPersons);
+
             setNewNotification({
                 message: `Contact "${newName} - ${newNumber}" created`,
                 type: "created",
