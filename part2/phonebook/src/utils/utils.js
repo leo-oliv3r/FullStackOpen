@@ -3,7 +3,8 @@ function isNameInList(name, list) {
 }
 
 function isNumberInList(number, list) {
-    return list.find((item) => Number(item.phoneNumber) === Number(number));
+    const removeSpecialChars = (numberString) => numberString.replace(/[^0-9]/g, "");
+    return list.find((item) => removeSpecialChars(item.number) === removeSpecialChars(number));
 }
 
 export { isNameInList, isNumberInList };
