@@ -21,15 +21,6 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model("Note", noteSchema);
 
-const notesFound = await Note.find({ content: /html/i });
+const notesFound = await Note.find({});
 notesFound.forEach((note) => console.log(note));
 mongoose.connection.close().then(() => process.exit());
-
-// const note = new Note({
-//     content: "See result object",
-//     important: true,
-// });
-// const result = await note.save();
-// console.log(result);
-// console.log("note saved!");
-// mongoose.connection.close();
