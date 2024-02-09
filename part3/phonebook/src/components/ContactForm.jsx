@@ -14,6 +14,14 @@ function ContactForm({
     async function handleSubmit(e) {
         e.preventDefault();
 
+        if (newName === "" || newNumber === "") {
+            setNewNotification({
+                message: `Name and Number required`,
+                type: "warning",
+            });
+            return;
+        }
+
         if (isNameInList(newName, persons)) {
             setNewNotification({
                 message: `Name "${newName}" is already on the phonebook`,
