@@ -19,5 +19,4 @@ const contactSchema = new mongoose.Schema({
     number: String,
 });
 
-const contactModel = new mongoose.model("Contact", contactSchema);
-
+const Contact = new mongoose.model("Contact", contactSchema);
