@@ -20,3 +20,5 @@ const contactSchema = new mongoose.Schema({
 });
 
 const Contact = new mongoose.model("Contact", contactSchema);
+
+
