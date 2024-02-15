@@ -1,23 +1,25 @@
 import axios from "axios";
 const baseUrl = "/api/notes";
 
-function getAll() {
-    const request = axios.get(baseUrl);
-    return request.then((response) => response.data);
+async function getAll() {
+	const notes = await axios.get(baseUrl);
+	return notes.data;
 }
 
-function create(newObject) {
-    const request = axios.post(baseUrl, newObject);
-    return request.then((response) => response.data);
+async function create(newNote) {
+	const request = axios.post(baseUrl, newNote);
+	const createdNote = (await request).data;
+	return createdNote;
 }
 
-function update(id, newObject) {
-    const request = axios.put(`${baseUrl}/${id}`, newObject);
-    return request.then((response) => response.data);
+async function update(id, newNote) {
+	const request = axios.put(`${baseUrl}/${id}`, newNote);
+	const updatedNote = (await request).data;
+	return updatedNote;
 }
 
 export default {
-    getAll,
-    create,
-    update,
+	getAll,
+	create,
+	update,
 };
