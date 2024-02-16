@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 mongoose.set("strictQuery", false);
 
 const url = process.env.MONGODB_URI;
-console.log(url);
+
 
 try {
 	console.log(`Connecting...`);
