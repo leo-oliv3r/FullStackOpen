@@ -1,32 +1,6 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
-
-if (process.argv.length !== 3) {
-	console.log("Usage: node index.js <password>");
-	process.exit(1);
-}
-
-const password = process.argv[2];
-const url = `mongodb+srv://leonardovic3nte:${password}@cluster0.zgevewk.mongodb.net/?retryWrites=true&w=majority`;
-
-mongoose.set("strictQuery", false);
-await mongoose.connect(url);
-
-const noteSchema = new mongoose.Schema({
-	content: String,
-	important: Boolean,
-});
-
-noteSchema.set("toJSON", {
-	transform: (document, returnedObject) => {
-		returnedObject.id = returnedObject._id.toString();
-		delete returnedObject._id;
-		delete returnedObject.__v;
-	},
-});
-
-const Note = mongoose.model("Note", noteSchema);
+import Note from "./models/note.js";
 
 const app = express();
 
@@ -44,7 +18,7 @@ app.use(requestLogger);
 app.use(express.static("build"));
 
 app.get("/", (req, res) => {
-	res.send(`<h1>Hello! /api/notes endpoint for notes api usage</h1>`);
+	res.send("<h1>Hello! /api/notes endpoint for notes api usage</h1>");
 });
 
 app.get("/api/notes", async (req, res) => {
@@ -66,21 +40,18 @@ app.post("/api/notes", async (request, response) => {
 		important: noteData.important || false,
 	});
 
-	response.status(201).json(await note.save());
+	return response.status(201).json(await note.save());
 });
 
-// app.get("/api/notes/:id", (request, response) => {
-// 	const id = Number(request.params.id);
-// 	const note = notes.find((note) => note.id === id);
+app.get("/api/notes/:id", async (request, response) => {
+	const note = await Note.findById(request.params.id);
 
-// 	if (note) {
-// 		response.json(note);
-// 	} else {
-// 		response.status(404).end();
-// 	}
-
-// 	response.json(note);
-// });
+	if (note) {
+		response.json(note);
+	} else {
+		response.status(404).end();
+	}
+});
 
 // app.delete("/api/notes/:id", (request, response) => {
 // 	const id = Number(request.params.id);
@@ -94,7 +65,7 @@ function unknownEndpoint(request, response) {
 }
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001;
+const { PORT } = process.env;
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
 });
