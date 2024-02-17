@@ -1,115 +1,69 @@
 import express from "express";
 import morgan from "morgan";
+import Contact from "./models/contact.js";
 
-morgan.token("type", (req) => {
-    if (req.method === "POST") {
-        return JSON.stringify(req.body);
-    }
-});
 
-let phonebookData = [
-    {
-        id: 1,
-        name: "Arto Hellas",
-        number: "040-123456",
-    },
-    {
-        id: 2,
-        name: "Ada Lovelace",
-        number: "39-44-5323523",
-    },
-    {
-        id: 3,
-        name: "Dan Abramov",
-        number: "12-43-234345",
-    },
-    {
-        id: 4,
-        name: "Mary Poppendieck",
-        number: "39-23-6423122",
-    },
-];
+// @todo Once integration with frontend is done, deploy to fly.io
 
 const app = express();
-// eslint-disable-next-line no-undef
-const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
-app.use(morgan(":method url :status - length: :res[content-length] - :response-time ms :type"));
-app.use(express.static("dist"));
+app.use(morgan("tiny"));
 
-app.get("/api/persons", (request, response) => {
-    response.json(phonebookData);
+app.get("/api/persons", async (request, response) => {
+  const foundContacts = await Contact.find({});
+  console.log(foundContacts);
+  return response.json(foundContacts);
 });
 
-app.get("/api/persons/:id", (request, response) => {
-    const id = Number(request.params.id);
-    const person = phonebookData.find((entry) => entry.id === id);
+app.get("/api/persons/:id", async (request, response) => {
+  const person = await Contact.findById(request.params.id);
 
-    if (person) {
-        response.json(person);
-    }
+  if (person) {
+    return response.json(person);
+  }
 
-    response.status(404).end();
+  return response.status(404).send({
+    error: "No contact with provided id found",
+  });
 });
 
-app.get("/info", (request, response) => {
-    const nrOfPeople = phonebookData.length;
-    const timeOfRequest = new Date();
+app.get("/", async (request, response) => {
+  const nrOfPeople = (await Contact.find({})).length;
+  const timeOfRequest = new Date();
 
-    response.send(`<p>Phonebook has info for ${nrOfPeople} people</p>${timeOfRequest}`);
+  return response.send(`<p>Phonebook has info of ${nrOfPeople} people</p>${timeOfRequest}`);
 });
 
-app.post("/api/persons", (request, response) => {
-    const getHighestId = (list) => Math.max(...list.map((item) => item.id));
-    const availableId = getHighestId(phonebookData) + 1;
+app.post("/api/persons", async (request, response) => {
+  const { name, number } = request.body;
 
-    const { name, number } = request.body;
+  const newContact = new Contact({
+    name,
+    number,
+  });
 
-    function isNameInList(list, name) {
-        return list.find((item) => item.name.toLowerCase() === name.toLowerCase());
-    }
-
-    function isNumberInList(list, number) {
-        return list.find((item) => Number(item.number) === Number(number));
-    }
-
-    if (isNameInList(phonebookData, name)) {
-        return response.status(409).send({ error: "Names must be unique" });
-    }
-
-    if (isNumberInList(phonebookData, number)) {
-        return response.status(409).send({ error: "Number must be unique" });
-    }
-
-    const newContact = {
-        id: availableId,
-        name,
-        number,
-    };
-
-    phonebookData = phonebookData.concat(newContact);
-    return response.status(201).json(newContact);
+  const returnedData = await newContact.save();
+  return response.status(201).json(returnedData);
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-    const id = Number(request.params.id);
-    const person = phonebookData.find((entry) => entry.id === id);
+app.delete("/api/persons/:id", async (request, response) => {
+  const person = await Contact.findById(request.params.id);
 
-    if (person) {
-        phonebookData = phonebookData.filter((entry) => entry.id !== id);
-        response.status(204).end();
-    }
+  if (person) {
+    await person.deleteOne({ _id: request.params.id });
+    return response.status(204).end();
+  }
 
-    response.status(404).end();
+  return response.status(404).json({ error: "No contact with provided id found" });
 });
 
 function unknownEndpoint(request, response) {
-    response.status(404).send({ error: "unknown endpoint" });
+  response.status(404).send({ error: "unknown endpoint" });
 }
-
 app.use(unknownEndpoint);
 
+const { PORT } = process.env;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

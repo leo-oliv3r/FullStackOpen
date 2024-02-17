@@ -1,30 +1,27 @@
 {
-    "name": "fullstackopen",
-    "version": "0.0.1",
-    "description": "",
-    "main": "index.js",
-    "type": "module",
-    "scripts": {
-        "start": "node index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon index.js"
-    },
-    "author": "",
-    "license": "MIT",
-    "devDependencies": {
-        "@flydotio/dockerfile": "^0.5.0",
-        "@typescript-eslint/eslint-plugin": "^7.0.1",
-        "eslint": "^8.56.0",
-        "eslint-config-airbnb-base": "^15.0.0",
-        "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-import": "^2.29.1",
-        "eslint-plugin-no-floating-promise": "^1.0.2",
-        "eslint-plugin-promise": "^6.1.1",
-        "nodemon": "^3.0.3"
-    },
-    "dependencies": {
-        "express": "^4.18.2",
-        "mongoose": "^8.1.1",
-        "morgan": "^1.10.0"
-    }
+	"name": "fullstackopen",
+	"version": "0.0.1",
+	"description": "",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"start": "node index.js",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "nodemon index.js"
+	},
+	"author": "",
+	"license": "MIT",
+	"devDependencies": {
+		"eslint": "^8.56.0",
+		"eslint-config-airbnb-base": "^15.0.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-import": "^2.29.1",
+		"nodemon": "^3.0.3"
+	},
+	"dependencies": {
+		"express": "^4.18.2",
+		"mongoose": "^8.1.2",
+		"morgan": "^1.10.0",
+		"dotenv": "^16.4.4"
+	}
 }

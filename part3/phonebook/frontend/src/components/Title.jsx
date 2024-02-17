@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
+import React from "react";
+
 function Title({ children }) {
-    return <h1>{children}</h1>;
+  return <h1>{children}</h1>;
 }
 
 export default Title;
