@@ -1,66 +1,66 @@
 /* eslint-disable react/prop-types */
-import React from "react";
-import phonebookService from "../services/phonebook";
-import { isNameInList, isNumberInList } from "../utils/utils";
+import { React, useState } from "react";
+import isNameInList from "../utils/utils";
+import { updateContact, createContact } from "../services/phonebook";
 
-function ContactForm({
-  setNewName,
-  newName,
-  setPersons,
-  persons,
-  newNumber,
-  setNewNumber,
-  setNewNotification,
-}) {
-  async function handleSubmit(e) {
+function ContactForm({ setPersons, persons, setNewNotification }) {
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+
+  const resetInput = () => {
+    setNewName("");
+    setNewNumber("");
+  };
+
+  const updateContactList = (newPerson) => setPersons((oldState) => [...oldState, newPerson]);
+
+  const sendNotification = (message, type) => setNewNotification({ message, type });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (newName === "" || newNumber === "") {
-      setNewNotification({
-        message: `Name and Number required`,
-        type: "warning",
-      });
+      sendNotification(`Name and Number required`, "warning");
       return;
     }
+
+    const newData = {
+      name: newName.trim(),
+      number: newNumber.trim(),
+    };
 
     if (isNameInList(newName, persons)) {
-      setNewNotification({
-        message: `Name "${newName}" is already on the phonebook`,
-        type: "warning",
-      });
-      return;
+      // eslint-disable-next-line no-restricted-globals, no-alert
+      const isToUpdate = confirm(`${newName} already in use, do you want to update the number?`);
+      if (!isToUpdate) return;
+
+      try {
+        const contactFound = persons.find(
+          (person) => person.name.toLowerCase() === newName.toLowerCase()
+        );
+        const updatedContact = await updateContact(contactFound.id, newData);
+
+        const updatedContacts = persons.map((person) =>
+          person.id !== updatedContact.id ? person : updatedContact
+        );
+
+        setPersons(updatedContacts);
+        sendNotification(`Contact ${newName} updated!`, "created");
+      } catch (error) {
+        sendNotification(error.message, "warning");
+      }
+    } else {
+      try {
+        const newPerson = await createContact(newData);
+        updateContactList(newPerson);
+        sendNotification(`Contact "${newName} - ${newNumber}" created`, "created");
+      } catch (error) {
+        sendNotification(error.message, "warning");
+      }
     }
 
-    if (isNumberInList(newNumber, persons)) {
-      setNewNotification({
-        message: `Number ${newNumber} is already on the phonebook`,
-        type: "warning",
-      });
-      return;
-    }
-
-    try {
-      const newPerson = await phonebookService.createContact({
-        name: newName.trim(),
-        number: newNumber.trim(),
-      });
-
-      const newPersons = [...persons, newPerson];
-      setPersons(newPersons);
-
-      setNewNotification({
-        message: `Contact "${newName} - ${newNumber}" created`,
-        type: "created",
-      });
-      setNewName("");
-      setNewNumber("");
-    } catch (error) {
-      setNewNotification({
-        message: `Error: ${error.response.data.error}`,
-        type: "warning",
-      });
-    }
-  }
+    resetInput();
+  };
 
   return (
     <form onSubmit={handleSubmit}>

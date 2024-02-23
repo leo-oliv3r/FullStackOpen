@@ -8,8 +8,8 @@ async function getAllPersons() {
 }
 
 async function createContact(contact) {
-  const newContact = await axios.post(BASE_URL, contact).then((res) => res.data);
-  return newContact;
+  const response = await axios.post(BASE_URL, contact);
+  return response.data;
 }
 
 async function deleteContact(id) {
@@ -17,8 +17,11 @@ async function deleteContact(id) {
   return response.status;
 }
 
-export default {
-  getAllPersons,
-  createContact,
-  deleteContact,
-};
+async function updateContact(id, newData) {
+  const response = await axios.put(`${BASE_URL}/${id}`, newData);
+  return response.data;
+}
+
+// @todo Update the imports on all files, instead of shared namespace, import
+// individually
+export { getAllPersons, createContact, deleteContact, updateContact };

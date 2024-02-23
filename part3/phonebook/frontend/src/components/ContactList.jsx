@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from "react";
-import phonebookService from "../services/phonebook";
+import { deleteContact } from "../services/phonebook";
 import Button from "./Button";
 
 function Contact({ name, phoneNumber }) {
@@ -16,29 +16,24 @@ function ContactList({ persons, setPersons, setNewNotification, searchWord }) {
     ? persons.filter((person) => person.name.toLowerCase().includes(searchWord.toLowerCase()))
     : persons;
 
-  const handleClick = (person) => {
+  const sendNotification = (message, type) => setNewNotification({ message, type });
+
+  const handleDeleteClick = async (person) => {
     // eslint-disable-next-line no-alert, no-restricted-globals
     const confirmed = confirm(`Confirm delete of ${person.name.toUpperCase()}?`);
+    const personToDelete = person;
 
     if (confirmed) {
-      phonebookService
-        .deleteContact(person.id)
-        .then(() => {
-          setNewNotification({
-            message: `Contact ${person.name} deleted`,
-            type: "deleted",
-          });
-          const newPersons = persons.filter((current) => current.id !== person.id);
-          setPersons(newPersons);
-        })
-        .catch(() => {
-          setNewNotification({
-            message: `Contact ${person.name} was already deleted on server`,
-            type: "deleted",
-          });
+      try {
+        await deleteContact(personToDelete.id);
+        sendNotification(`Contact ${personToDelete.name} deleted`, "deleted");
+      } catch (error) {
+        sendNotification(`Contact ${personToDelete.name} was already deleted on server`, "deleted");
+        return;
+      }
 
-          phonebookService.getAllPersons().then((res) => setPersons(res));
-        });
+      const newPersons = persons.filter((current) => current.id !== personToDelete.id);
+      setPersons(newPersons);
     }
   };
 
@@ -48,7 +43,7 @@ function ContactList({ persons, setPersons, setNewNotification, searchWord }) {
       {personsToRender.map((person) => (
         <div key={person.id}>
           <Contact name={person.name} phoneNumber={person.number} />
-          <Button onClick={() => handleClick(person)}>Delete</Button>
+          <Button onClick={() => handleDeleteClick(person)}>Delete</Button>
         </div>
       ))}
     </>
