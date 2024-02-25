@@ -17,9 +17,13 @@ app.get("/", async (request, response) => {
   return response.send(`<p>Phonebook has info of ${nrOfPeople} people</p>${timeOfRequest}`);
 });
 
-app.get("/api/persons", async (request, response) => {
-  const foundContacts = await Contact.find({});
-  return response.json(foundContacts);
+app.get("/api/persons", async (request, response, next) => {
+  try {
+    const foundContacts = await Contact.find({});
+    return response.json(foundContacts);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 app.get("/api/persons/:id", async (request, response, next) => {
@@ -44,8 +48,12 @@ app.post("/api/persons", async (request, response, next) => {
     number,
   });
 
-  const returnedData = await newContact.save().catch(next);
-  return response.status(201).json(returnedData);
+  try {
+    const returnedData = await newContact.save().catch(next);
+    return response.status(201).json(returnedData);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 app.put("/api/persons/:id", async (request, response, next) => {
@@ -53,15 +61,18 @@ app.put("/api/persons/:id", async (request, response, next) => {
   const { name, number } = request.body;
 
   try {
-    if (!name || !number) throw new Error("BadInput");
-
     const updatedData = {
       name,
       number,
     };
 
-    const updatedContact = await Contact.findByIdAndUpdate(id, updatedData, { new: true });
+    const updatedContact = await Contact.findByIdAndUpdate(id, updatedData, {
+      new: true,
+      runValidators: true,
+      context: "query",
+    });
     if (!updatedContact) throw new NotFoundError();
+
     return response.json(updatedContact);
   } catch (error) {
     return next(error);
@@ -102,6 +113,10 @@ function errorHandler(error, request, response, next) {
 
   if (error.message === "BadInput") {
     return response.status(400).send({ error: "data missing or invalid" });
+  }
+
+  if (error.name === "ValidationError") {
+    return response.status(400).send({ error: error.message });
   }
 
   return next(error);

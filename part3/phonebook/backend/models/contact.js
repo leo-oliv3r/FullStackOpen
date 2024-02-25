@@ -13,8 +13,19 @@ try {
 }
 
 const contactSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
+  number: {
+    type: String,
+    validate: {
+      validator: (received) => /^\d{2,3}-\d{2,}$/.test(received),
+      message: ({ value }) =>
+        `${value} is not a valid phone number! Use following format: XX-XXXXXXXX`,
+    },
+  },
 });
 
 contactSchema.set("toJSON", {

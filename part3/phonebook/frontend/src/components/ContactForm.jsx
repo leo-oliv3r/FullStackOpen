@@ -19,8 +19,13 @@ function ContactForm({ setPersons, persons, setNewNotification }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (newName === "" || newNumber === "") {
-      sendNotification(`Name and Number required`, "warning");
+    if (newName === "" || newName.length < 3) {
+      sendNotification(`Name is required and should be at least 3 characters long`, "warning");
+      return;
+    }
+
+    if (newNumber === "" || newNumber.length < 10) {
+      sendNotification(`Number is required and should be at least 10 characters long`, "warning");
       return;
     }
 
@@ -66,12 +71,25 @@ function ContactForm({ setPersons, persons, setNewNotification }) {
     <form onSubmit={handleSubmit}>
       <label htmlFor="new-name">
         Name
-        <input id="new-name" value={newName} onChange={(e) => setNewName(e.target.value)} />
+        <input
+          id="new-name"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          required
+          minLength={2}
+        />
       </label>
 
       <label htmlFor="new-number">
         Number
-        <input id="new-number" value={newNumber} onChange={(e) => setNewNumber(e.target.value)} />
+        <input
+          id="new-number"
+          value={newNumber}
+          onChange={(e) => setNewNumber(e.target.value)}
+          required
+          pattern="/^\d{2,3}-\d{2,}$/"
+          title="Example: XX-XXXXXXXX"
+        />
       </label>
 
       <button type="submit">Add Contact</button>

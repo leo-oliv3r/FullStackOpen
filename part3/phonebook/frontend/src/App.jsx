@@ -17,7 +17,7 @@ function App() {
   }, []);
 
   return (
-    <div style={{ fontFamily: "sans-serif" }}>
+    <div>
       <Title>Phone Book</Title>
 
       <SearchBar searchWord={searchWord} setSearchWord={setSearchWord} />

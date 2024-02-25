@@ -22,6 +22,4 @@ async function updateContact(id, newData) {
   return response.data;
 }
 
-// @todo Update the imports on all files, instead of shared namespace, import
-// individually
 export { getAllPersons, createContact, deleteContact, updateContact };
