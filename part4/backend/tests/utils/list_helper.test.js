@@ -1,6 +1,11 @@
 import { test, describe } from "node:test";
 import assert from "node:assert";
-import { dummy, getSumOfLikes, getFavoriteBlog } from "../../utils/list_helper.js";
+import {
+  dummy,
+  getSumOfLikes,
+  getFavoriteBlog,
+  getAuthorWithMostBlogs,
+} from "../../utils/list_helper.js";
 
 test("dummy returns one", () => {
   const blogs = [];
@@ -88,7 +93,7 @@ describe("getSumOfLikes", () => {
 });
 
 describe("getFavoriteBlog", () => {
-  test("return null when given no blogs", () => {
+  test("return null with no blogs given", () => {
     assert.strictEqual(getFavoriteBlog(emptyBlogsList), null);
   });
 
@@ -110,5 +115,27 @@ describe("getFavoriteBlog", () => {
     };
 
     assert.deepStrictEqual(getFavoriteBlog(blogs), expected);
+  });
+});
+
+describe("getAuthorWithMostBlogs", () => {
+  test("return null with empty blogs list", () => {
+    assert.strictEqual(getAuthorWithMostBlogs(emptyBlogsList), null);
+  });
+
+  test("return correct author with one blog", () => {
+    const expected = {
+      name: "Edsger W. Dijkstra",
+      nrBlogs: 1,
+    };
+    assert.deepStrictEqual(getAuthorWithMostBlogs(listWithOneBlog), expected);
+  });
+
+  test("return correct author with multiple blogs", () => {
+    const expected = {
+      name: "Robert C. Martin",
+      nrBlogs: 3,
+    };
+    assert.deepStrictEqual(getAuthorWithMostBlogs(blogs), expected);
   });
 });

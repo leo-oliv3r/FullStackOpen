@@ -13,8 +13,21 @@ function getFavoriteBlog(blogs) {
   const mostLikedBlog = blogs.find((blog) => blog.likes === highestNrOfLikes);
 
   const { title, author, likes } = mostLikedBlog;
-
   return { title, author, likes };
 }
 
-export { dummy, getSumOfLikes, getFavoriteBlog };
+function getAuthorWithMostBlogs(blogs) {
+  if (blogs.length === 0) return null;
+
+  const uniqueNames = Array.from(new Set(blogs.map((blog) => blog.author)));
+  const authorsWithNrBlogs = uniqueNames.map((name) => ({ name, nrBlogs: 0 }));
+
+  blogs.forEach((blog) => {
+    const currentAuthor = authorsWithNrBlogs.find((author) => author.name === blog.author);
+    currentAuthor.nrBlogs += 1;
+  });
+
+  return authorsWithNrBlogs.sort((a, b) => b.nrBlogs - a.nrBlogs)[0];
+}
+
+export { dummy, getSumOfLikes, getFavoriteBlog, getAuthorWithMostBlogs };
