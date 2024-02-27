@@ -1,5 +1,9 @@
 function dummy(blogs) {
-return 1;
+  return 1;
 }
 
-export default dummy;
+function getSumOfLikes(blogs) {
+  return blogs.map((blog) => blog.likes).reduce((acc, current) => acc + current, 0);
+}
+
+export { dummy, getSumOfLikes };
