@@ -3,5 +3,6 @@ import app from "./app.js";
 import logger from "./utils/logger.js";
 
 app.listen(config.PORT, () => {
-  logger.info(`Server running on port ${config.PORT}`);
+  logger.info(`running in ${process.env.NODE_ENV} mode`);
+  logger.info(`server running on port ${config.PORT}`);
 });
