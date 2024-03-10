@@ -5,7 +5,7 @@ import {
   getAuthorWithMostBlogs,
   getFavoriteBlog,
   getSumOfLikes,
-} from "../../utils/blogListHelper.js";
+} from "./blogListHelper.js";
 
 test("dummy returns one", () => {
   const blogs = [];
