@@ -21,6 +21,16 @@ const blogSchema = new mongoose.Schema({
   },
 });
 
+blogSchema.set("toJSON", {
+  transform: (_, returnedObject) => {
+    const copy = { ...returnedObject };
+    copy.id = copy._id.toString();
+    delete copy._id;
+    delete copy.__v;
+    return copy;
+  },
+});
+
 const Blog = mongoose.model("Blog", blogSchema);
 
 export default Blog;
