@@ -1,11 +1,11 @@
-import { test, describe } from "node:test";
+import { describe, test } from "node:test";
 import assert from "node:assert";
 import {
   dummy,
-  getSumOfLikes,
-  getFavoriteBlog,
   getAuthorWithMostBlogs,
-} from "../../utils/list_helper.js";
+  getFavoriteBlog,
+  getSumOfLikes,
+} from "../../utils/blogListHelper.js";
 
 test("dummy returns one", () => {
   const blogs = [];

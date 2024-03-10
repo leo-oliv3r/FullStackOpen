@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import config from "./utils/config.js";
-import blogRouter from "./controllers/blogs.js";
+import blogRouter from "./controllers/blogController.js";
 import logger from "./utils/logger.js";
 
 const app = express();
