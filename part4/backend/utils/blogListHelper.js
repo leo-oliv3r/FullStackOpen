@@ -1,10 +1,5 @@
-// eslint-disable-next-line no-unused-vars
-function dummy(blogs) {
-  return 1;
-}
-
 function getSumOfLikes(blogs) {
-  return blogs.map((blog) => blog.likes).reduce((acc, current) => acc + current, 0);
+  return blogs.map((blog) => blog.likes || 0).reduce((acc, current) => acc + current, 0);
 }
 
 function getFavoriteBlog(blogs) {
@@ -21,14 +16,16 @@ function getAuthorWithMostBlogs(blogs) {
   if (blogs.length === 0) return null;
 
   const uniqueNames = Array.from(new Set(blogs.map((blog) => blog.author)));
-  const authorsWithNrBlogs = uniqueNames.map((name) => ({ name, nrBlogs: 0 }));
+  const blogsScore = uniqueNames.map((name) => ({ author: name, nrBlogs: 0 }));
 
   blogs.forEach((blog) => {
-    const currentAuthor = authorsWithNrBlogs.find((author) => author.name === blog.author);
+    const currentAuthor = blogsScore.find((author) => author.author === blog.author);
+
+    // @ts-ignore
     currentAuthor.nrBlogs += 1;
   });
 
-  return authorsWithNrBlogs.sort((a, b) => b.nrBlogs - a.nrBlogs)[0];
+  return blogsScore.sort((a, b) => b.nrBlogs - a.nrBlogs)[0];
 }
 
-export { dummy, getSumOfLikes, getFavoriteBlog, getAuthorWithMostBlogs };
+export { getSumOfLikes, getFavoriteBlog, getAuthorWithMostBlogs };
