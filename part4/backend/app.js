@@ -7,6 +7,8 @@ import logger from "./utils/logger.js";
 
 const app = express();
 
+if (!config.MONGODB_URI) throw new Error("No database URI provided");
+
 try {
   logger.info("connecting to database...");
   await mongoose.connect(config.MONGODB_URI);
