@@ -69,7 +69,7 @@ describe("getFavoriteBlog", () => {
     assert.strictEqual(getFavoriteBlog(emptyBlogsList), null);
   });
 
-  test("correctly return formatted data for two blog list", () => {
+  test("return correctly formatted data for two blog list", () => {
     const sampleBlogs = [
       { title: "blog1", author: "author1", likes: 5 },
       { title: "blog2", author: "author2", likes: 6 },
@@ -77,7 +77,7 @@ describe("getFavoriteBlog", () => {
     assert.deepStrictEqual(getFavoriteBlog(sampleBlogs), sampleBlogs[1]);
   });
 
-  test("correctly return formatted data for many blogs list", () => {
+  test("return correctly formatted data for many blogs list", () => {
     const blogWithMostLikes = blogsTestData[2];
     const sut = getFavoriteBlog(blogsTestData);
 

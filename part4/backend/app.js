@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import config from "./utils/config.js";
 import blogRouter from "./controllers/blogController.js";
 import logger from "./utils/logger.js";
+import middleware from "./utils/middleware.js";
 
 const app = express();
 
@@ -21,5 +22,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/blogs", blogRouter);
+
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 
 export default app;
