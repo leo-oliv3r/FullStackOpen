@@ -24,10 +24,15 @@ const BLOGS_URI = "/api/blogs";
 
 function assertBlogShape(blog) {
   assert(blog && typeof blog === "object");
-  const expectedProperties = ["id", "author", "title", "url", " likes"];
+  const expectedProperties = ["id", "author", "title", "url", "likes"];
   expectedProperties.forEach((prop) => assert(Object.prototype.hasOwnProperty.call(blog, prop)));
   assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "_id"), false);
   assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "__v"), false);
+}
+
+function generateValidMongooseId() {
+  const id = new mongoose.Types.ObjectId();
+  return id.toString();
 }
 
 beforeEach(async () => {
@@ -50,9 +55,26 @@ describe("GET", () => {
       fetchedBlogs.forEach((blog) => assertBlogShape(blog));
     });
   });
+
+  describe("/api/blogs/:id", () => {
+    test("return 200 and the note with the specified id if it exists", async () => {
+      const firstBlogInDB = await Blog.findOne({});
+      // @ts-ignore
+      const { id } = firstBlogInDB;
+
+      const response = await api
+        .get(`${BLOGS_URI}/${id}`)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      const blogFound = response.body;
+
+      assertBlogShape(blogFound);
+    });
+  });
 });
 
-describe.only("POST", () => {
+describe("POST", () => {
   const validInput = {
     title: "Title",
     author: "Author",
@@ -65,8 +87,8 @@ describe.only("POST", () => {
     author: "as",
   };
 
-  describe.only("/api/blogs", () => {
-    test.only("given valid input, correctly create blog with 201 response", async () => {
+  describe("/api/blogs", () => {
+    test("given valid input, correctly create blog with 201 response", async () => {
       const initialBlogs = await Blog.find({});
 
       await api
@@ -80,7 +102,7 @@ describe.only("POST", () => {
       assert(updatedBlogs.length === initialBlogs.length + 1);
     });
 
-    test.only("correctly add default data if none provided", async () => {
+    test("correctly add default data if none provided", async () => {
       const response = await api
         .post(BLOGS_URI)
         .send(validInput)
@@ -90,9 +112,74 @@ describe.only("POST", () => {
       assert(Object.prototype.hasOwnProperty.call(createdNote, "likes"));
     });
 
-    test.only("correctly rejects given data that does not conform to schema", async () => {
+    test("correctly rejects given data that does not conform to schema", async () => {
       const response = await api.post(BLOGS_URI).send(invalidInput).expect(400);
       assert(response.body.error.includes("validation failed"));
+    });
+  });
+});
+
+describe("DELETE", () => {
+  describe("api/blogs/:id", () => {
+    test("given valid id, correctly delete blog", async () => {
+      const blogsBeforeDelete = await Blog.find({});
+      const validId = blogsBeforeDelete[0].id;
+
+      await api.delete(`${BLOGS_URI}/${validId}`).expect(204);
+      const blogsAfterDelete = await Blog.find({});
+
+      assert(blogsAfterDelete.length === blogsBeforeDelete.length - 1);
+    });
+
+    test("given invalid id, return 404", async () => {
+      const blogsBeforeDelete = await Blog.find({});
+      const validId = blogsBeforeDelete[0].id;
+
+      await api.delete(`${BLOGS_URI}/${validId}`).expect(204);
+      const blogsAfterDelete = await Blog.find({});
+
+      assert(blogsAfterDelete.length === blogsBeforeDelete.length - 1);
+    });
+  });
+});
+
+describe("PUT", () => {
+  describe("/api/blogs/:id", () => {
+    test("given valid id, correctly update blog", async () => {
+      const firstBlogInDB = await Blog.findOne({});
+      const validId = firstBlogInDB?.id;
+
+      const updatedData = {
+        title: "Updated Blog",
+        author: "Updated Author",
+        url: "https://example.com/updated-blog",
+      };
+
+      const response = await api
+        // @ts-ignore
+        .put(`${BLOGS_URI}/${validId}`)
+        .send(updatedData)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      assertBlogShape(response.body);
+    });
+
+    test("given valid id, but no blog found, return 404", async () => {
+      const validId = generateValidMongooseId();
+      const updatedData = {
+        title: "Updated Blog",
+        author: "Updated Author",
+        url: "https://example.com/updated-blog",
+      };
+
+      await api.put(`${BLOGS_URI}/${validId}`).send(updatedData).expect(404);
+    });
+
+    test("given invalid id, return 400", async () => {
+      const invalidId = "invalid-id";
+
+      await api.put(`${BLOGS_URI}/${invalidId}`).send({}).expect(400);
     });
   });
 });
