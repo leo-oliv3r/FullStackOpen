@@ -131,14 +131,14 @@ describe("DELETE", () => {
       assert(blogsAfterDelete.length === blogsBeforeDelete.length - 1);
     });
 
-    test("given invalid id, return 404", async () => {
-      const blogsBeforeDelete = await Blog.find({});
-      const validId = blogsBeforeDelete[0].id;
+    test("given valid id, but no blog found, return 404", async () => {
+      const randomValidId = generateValidMongooseId();
+      await api.delete(`${BLOGS_URI}/${randomValidId}`).expect(404);
+    });
 
-      await api.delete(`${BLOGS_URI}/${validId}`).expect(204);
-      const blogsAfterDelete = await Blog.find({});
-
-      assert(blogsAfterDelete.length === blogsBeforeDelete.length - 1);
+    test("given invalid id return 400", async () => {
+      const invalidId = "invalidId";
+      await api.delete(`${BLOGS_URI}/${invalidId}`).expect(400);
     });
   });
 });
