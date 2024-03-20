@@ -184,4 +184,4 @@ describe("PUT", () => {
   });
 });
 
-after(async () => mongoose.connection.close());
+after(() => mongoose.connection.close());
