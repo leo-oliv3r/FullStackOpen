@@ -23,6 +23,10 @@ app.use(express.json());
 
 app.use("/api/blogs", blogRouter);
 
+app.get("/", (_, res) => {
+  res.json({ blogs: "/api/blogs" });
+});
+
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
