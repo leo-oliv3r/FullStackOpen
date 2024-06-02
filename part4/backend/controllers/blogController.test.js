@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import assert from "node:assert";
 import supertest from "supertest";
 import app from "../app.js";
-import Blog from "../models/Blog.js";
+import Blog from "../models/blogModel.js";
 
 const api = supertest(app);
 
