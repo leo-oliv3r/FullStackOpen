@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: 3,
+    default: "Anonymous"
   },
 });
 
