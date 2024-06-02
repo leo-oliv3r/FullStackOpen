@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import config from "./utils/config.js";
 import blogRouter from "./controllers/blogController.js";
+import usersRouter from "./controllers/userController.js";
 import logger from "./utils/logger.js";
 import middleware from "./utils/middleware.js";
 
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/blogs", blogRouter);
+app.use("/api/users", usersRouter);
 
 app.get("/", (_, res) => {
   res.json({ blogs: "/api/blogs" });
