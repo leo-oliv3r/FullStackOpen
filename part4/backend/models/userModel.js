@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    minlength: 3,
   },
 
   passwordHash: {
@@ -15,7 +16,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: 3,
-    default: "Anonymous"
+    default: "Anonymous",
   },
 });
 
