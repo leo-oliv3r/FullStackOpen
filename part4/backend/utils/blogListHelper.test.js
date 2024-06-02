@@ -45,7 +45,7 @@ function getRandomBlog(blogsArray) {
   return blogsArray[Math.floor(Math.random() * blogsArray.length)];
 }
 
-describe("blog list helper functions", () => {
+describe("HELPER FUNCTIONS", () => {
   describe("getSumOfLikes", () => {
     test("return 0 with no blogs given", () => {
       const emptyBlogsList = [];
