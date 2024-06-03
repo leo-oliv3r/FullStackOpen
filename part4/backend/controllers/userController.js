@@ -4,6 +4,15 @@ import User from "../models/userModel.js";
 
 const usersRouter = express.Router();
 
+usersRouter.get("/", async (_, response, next) => {
+  try {
+    const usersFound = await User.find({});
+    return response.json(usersFound);
+  } catch (error) {
+    return next(error);
+  }
+});
+
 usersRouter.post("/", async (request, response, next) => {
   const { username, password } = request.body;
 
