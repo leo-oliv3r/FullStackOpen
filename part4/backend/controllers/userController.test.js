@@ -32,7 +32,7 @@ beforeEach(async () => {
   await rootUser.save();
 });
 
-describe("USERS CONTROLLER", () => {
+describe.only("USERS CONTROLLER", () => {
   test("db initialize with a root user", async () => {
     const usersFound = await User.find({});
 
@@ -61,12 +61,10 @@ describe("USERS CONTROLLER", () => {
       const usersFromRequest = body;
 
       assert(usersInDb.length === usersFromRequest.length);
-
-
     });
   });
 
-  describe("POST", () => {
+  describe.only("POST", () => {
     test("create user given unique username", async () => {
       const { username } = dummyUserData.userWithoutName;
       const requestData = { username, password: dummyPassword };
@@ -97,6 +95,21 @@ describe("USERS CONTROLLER", () => {
     test("returns 400 Bad Request if username is less than 3 chars", async () => {
       const username = "lv";
       const requestData = { username, password: dummyPassword };
+
+      const usersBefore = await User.find({});
+
+      await api
+        .post(USERS_URI)
+        .send(requestData)
+        .expect(400)
+        .expect("Content-Type", /application\/json/);
+
+      const usersAfter = await User.find({});
+      assert(usersBefore.length === usersAfter.length);
+    });
+
+    test.only("returns 400 Bad Request if password is less than 3 chars", async () => {
+      const requestData = { username: "lvo", password: "ab" };
 
       const usersBefore = await User.find({});
 
