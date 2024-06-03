@@ -20,6 +20,13 @@ const dummyUserData = {
   },
 };
 
+function isUserCorrectShape(user) {
+  if (!user.username || !user.blogs || !user.id) {
+    return false;
+  }
+  return true;
+}
+
 const dummyHash = await bcrypt.hash("dummyPassword", 10);
 const dummyPassword = "dummyPassword";
 
@@ -32,7 +39,7 @@ beforeEach(async () => {
   await rootUser.save();
 });
 
-describe.only("USERS CONTROLLER", () => {
+describe("USERS CONTROLLER", () => {
   test("db initialize with a root user", async () => {
     const usersFound = await User.find({});
 
@@ -64,16 +71,19 @@ describe.only("USERS CONTROLLER", () => {
     });
   });
 
-  describe.only("POST", () => {
+  describe("POST", () => {
     test("create user given unique username", async () => {
       const { username } = dummyUserData.userWithoutName;
       const requestData = { username, password: dummyPassword };
 
-      await api
+      const { body } = await api
         .post(USERS_URI)
         .send(requestData)
         .expect(201)
         .expect("Content-Type", /application\/json/);
+
+      const userCreated = body;
+      assert(isUserCorrectShape(userCreated));
     });
 
     test("returns 400 Bad Request if username is already found", async () => {
@@ -108,7 +118,7 @@ describe.only("USERS CONTROLLER", () => {
       assert(usersBefore.length === usersAfter.length);
     });
 
-    test.only("returns 400 Bad Request if password is less than 3 chars", async () => {
+    test("returns 400 Bad Request if password is less than 3 chars", async () => {
       const requestData = { username: "lvo", password: "ab" };
 
       const usersBefore = await User.find({});
