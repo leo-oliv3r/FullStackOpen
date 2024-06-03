@@ -49,6 +49,23 @@ describe("USERS CONTROLLER", () => {
     assert(savedUser.name === "Anonymous");
   });
 
+  describe("GET", () => {
+    test("correctly get users", async () => {
+      const usersInDb = await User.find({});
+
+      const { body } = await api
+        .get(USERS_URI)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      const usersFromRequest = body;
+
+      assert(usersInDb.length === usersFromRequest.length);
+
+
+    });
+  });
+
   describe("POST", () => {
     test("create user given unique username", async () => {
       const { username } = dummyUserData.userWithoutName;
