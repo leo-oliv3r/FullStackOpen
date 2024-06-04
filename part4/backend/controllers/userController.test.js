@@ -69,6 +69,34 @@ describe("USERS CONTROLLER", () => {
 
       assert(usersInDb.length === usersFromRequest.length);
     });
+
+    test("users are in correct shape", async () => {
+      const { body } = await api
+        .get(USERS_URI)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      const usersFromRequest = body;
+
+      usersFromRequest.forEach((user) => assert(isUserCorrectShape(user)));
+    });
+
+    test("correctly populate the blogs property", async () => {
+      const { body } = await api
+        .get(USERS_URI)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      const usersFound = body;
+
+      usersFound.forEach((user) => {
+        user.blogs.forEach((blog) => {
+          assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "id"), true);
+          assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "user"), true);
+          assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "title"), true);
+        });
+      });
+    });
   });
 
   describe("POST", () => {

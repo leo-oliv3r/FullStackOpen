@@ -18,6 +18,13 @@ const userSchema = new mongoose.Schema({
     minlength: 3,
     default: "Anonymous",
   },
+
+  blogs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Blog",
+    },
+  ],
 });
 
 userSchema.set("toJSON", {

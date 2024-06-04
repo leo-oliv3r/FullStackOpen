@@ -1,11 +1,12 @@
 import express from "express";
 import Blog from "../models/blogModel.js";
+import User from "../models/userModel.js";
 
 const blogRouter = express.Router();
 
 blogRouter.get("/:id", async (request, response, next) => {
   try {
-    const noteFound = await Blog.findById(request.params.id);
+    const noteFound = await Blog.findById(request.params.id).populate("user");
     return noteFound ? response.json(noteFound) : response.status(404).end();
   } catch (error) {
     return next(error);
@@ -14,7 +15,7 @@ blogRouter.get("/:id", async (request, response, next) => {
 
 blogRouter.get("/", async (_, response, next) => {
   try {
-    const blogsFound = await Blog.find({});
+    const blogsFound = await Blog.find({}).populate("user");
     return response.json(blogsFound);
   } catch (error) {
     return next(error);
@@ -22,9 +23,13 @@ blogRouter.get("/", async (_, response, next) => {
 });
 
 blogRouter.post("/", async (request, response, next) => {
-  const blogData = new Blog(request.body);
+  const { title, author, url } = request.body;
+  const validUser = await User.findOne({});
+  // @ts-ignore
+  const newBlog = new Blog({ title, author, url, user: validUser.id });
+
   try {
-    const saveResponse = await blogData.save();
+    const saveResponse = await newBlog.save();
     response.status(201).json(saveResponse);
   } catch (error) {
     next(error);

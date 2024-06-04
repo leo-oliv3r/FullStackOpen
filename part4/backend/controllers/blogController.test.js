@@ -4,6 +4,7 @@ import assert from "node:assert";
 import supertest from "supertest";
 import app from "../app.js";
 import Blog from "../models/blogModel.js";
+import User from "../models/userModel.js";
 
 const api = supertest(app);
 
@@ -116,6 +117,25 @@ describe("BLOG CONTROLLER", () => {
       test("correctly rejects given data that does not conform to schema", async () => {
         const response = await api.post(BLOGS_URI).send(invalidInput).expect(400);
         assert(response.body.error.includes("validation failed"));
+      });
+
+      // TODO Refactor once auth is implemented
+      test("correctly associate a blog created to first user", async () => {
+        const validUser = await User.findOne({});
+
+        if (!validUser) {
+          return;
+        }
+
+        const { body } = await api
+          .post(BLOGS_URI)
+          .send(validInput)
+          .expect(201)
+          .expect("Content-Type", /application\/json/);
+
+        const createdBlog = body;
+
+        assert.deepStrictEqual(createdBlog.user, validUser.id);
       });
     });
   });
