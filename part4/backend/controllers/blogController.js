@@ -15,7 +15,7 @@ blogRouter.get("/:id", async (request, response, next) => {
 
 blogRouter.get("/", async (_, response, next) => {
   try {
-    const blogsFound = await Blog.find({}).populate("user");
+    const blogsFound = await Blog.find({}).populate("user", { username: 1, name: 1 });
     return response.json(blogsFound);
   } catch (error) {
     return next(error);
@@ -25,8 +25,9 @@ blogRouter.get("/", async (_, response, next) => {
 blogRouter.post("/", async (request, response, next) => {
   const { title, author, url } = request.body;
   const validUser = await User.findOne({});
+
   // @ts-ignore
-  const newBlog = new Blog({ title, author, url, user: validUser.id });
+  const newBlog = new Blog({ title, author, url, user: validUser._id });
 
   try {
     const saveResponse = await newBlog.save();
