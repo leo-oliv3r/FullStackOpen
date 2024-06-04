@@ -94,6 +94,8 @@ describe("USERS CONTROLLER", () => {
           assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "id"), true);
           assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "user"), true);
           assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "title"), true);
+          assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "url"), true);
+          assert.strictEqual(Object.prototype.hasOwnProperty.call(blog, "likes"), true);
         });
       });
     });

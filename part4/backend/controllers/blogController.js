@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from "express";
 import Blog from "../models/blogModel.js";
 import User from "../models/userModel.js";
@@ -26,11 +27,12 @@ blogRouter.post("/", async (request, response, next) => {
   const { title, author, url } = request.body;
   const validUser = await User.findOne({});
 
-  // @ts-ignore
   const newBlog = new Blog({ title, author, url, user: validUser._id });
 
   try {
     const saveResponse = await newBlog.save();
+    validUser.blogs = validUser.blogs.concat(saveResponse._id);
+    await validUser.save();
     response.status(201).json(saveResponse);
   } catch (error) {
     next(error);

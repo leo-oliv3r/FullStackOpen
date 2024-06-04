@@ -6,7 +6,12 @@ const usersRouter = express.Router();
 
 usersRouter.get("/", async (_, response, next) => {
   try {
-    const usersFound = await User.find({}).populate("blogs");
+    const usersFound = await User.find({}).populate("blogs", {
+      title: 1,
+      author: 1,
+      url: 1,
+      likes: 1,
+    });
     return response.json(usersFound);
   } catch (error) {
     return next(error);
