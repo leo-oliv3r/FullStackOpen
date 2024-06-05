@@ -23,10 +23,12 @@ usersRouter.post("/", async (request, response, next) => {
 
   if (!username || !password) {
     next(new Error("username and password must be provided"));
+    return;
   }
 
   if (password.length < 3) {
     next(new Error("password must be at least 3 chars long"));
+    return;
   }
 
   let { name } = request.body;
