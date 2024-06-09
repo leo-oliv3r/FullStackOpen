@@ -20,6 +20,7 @@ try {
   logger.error(error.message);
 }
 
+app.use(middleware.tokenExtractor);
 app.use(cors());
 app.use(express.json());
 

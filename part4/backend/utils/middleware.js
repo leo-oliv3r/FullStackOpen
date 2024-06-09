@@ -8,6 +8,19 @@ function requestLogger(request, _, next) {
   next();
 }
 
+function tokenExtractor(request, _, next) {
+  const authHeader = request.get("authorization");
+
+  if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
+    next();
+    return;
+  }
+
+  // Extracts jwt token from header
+  request.token = authHeader.substring(7);
+  next();
+}
+
 function unknownEndpoint(_, response) {
   response.status(404).send({ error: "unknown endpoint" });
 }
@@ -41,4 +54,4 @@ function errorHandler(error, _, response, next) {
   return next(error);
 }
 
-export default { requestLogger, unknownEndpoint, errorHandler };
+export default { requestLogger, unknownEndpoint, errorHandler, tokenExtractor };

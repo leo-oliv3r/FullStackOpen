@@ -25,16 +25,13 @@ blogRouter.get("/", async (_, response, next) => {
 });
 
 blogRouter.post("/", async (request, response, next) => {
-  const authHeader = request.get("authorization");
-  if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
+  if (!request.token) {
     response.status(401).json({ error: "token missing or invalid" });
     return;
   }
 
-  // extract token
-  const token = authHeader.substring(7);
-
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  // @ts-ignore
+  const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
 
   if (!decodedToken.id) {
     response.status(401).json({ error: "invalid token" });
@@ -48,9 +45,9 @@ blogRouter.post("/", async (request, response, next) => {
     response.status(404).json({ error: "user not found" });
     return;
   }
+  const newBlog = new Blog({ title, author, url, user: validUser._id });
 
   try {
-    const newBlog = new Blog({ title, author, url, user: validUser._id });
     const saveResponse = await newBlog.save();
     validUser.blogs = validUser.blogs.concat(saveResponse._id);
     await validUser.save();

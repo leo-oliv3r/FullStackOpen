@@ -58,7 +58,7 @@ describe("LOGIN CONTROLLER", () => {
     });
 
     describe("unhappy path", () => {
-      test("rejest with 400 given no username", async () => {
+      test("reject with 400 given no username", async () => {
         const request = { password: rootUserData.password };
 
         await api
@@ -68,7 +68,7 @@ describe("LOGIN CONTROLLER", () => {
           .expect("Content-Type", /application\/json/);
       });
 
-      test("rejest with 400 given no password", async () => {
+      test("reject with 400 given no password", async () => {
         const request = { username: rootUserData.username };
 
         await api
