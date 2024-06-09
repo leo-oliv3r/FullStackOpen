@@ -6,6 +6,7 @@ import blogRouter from "./controllers/blogController.js";
 import usersRouter from "./controllers/userController.js";
 import logger from "./utils/logger.js";
 import middleware from "./utils/middleware.js";
+import loginRouter from "./controllers/loginController.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(express.json());
 
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/login", loginRouter);
 
 app.get("/", (_, res) => {
   res.json({ blogs: "/api/blogs" });

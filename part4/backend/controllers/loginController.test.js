@@ -1,7 +1,7 @@
-import { beforeEach, describe, test, after } from "node:test";
+import mongoose from "mongoose";
+import { describe, test, after } from "node:test";
 import assert from "node:assert";
 import supertest from "supertest";
-import User from "../models/userModel.js";
 import app from "../app.js";
 
 const api = supertest(app);
@@ -13,10 +13,10 @@ const rootUserData = {
   password: "password123",
 };
 
-describe.only("LOGIN CONTROLLER", () => {
-  describe.only("POST", () => {
-    describe.only("happy path", () => {
-      test.only("auth and send token to valid credentials", async () => {
+describe("LOGIN CONTROLLER", () => {
+  describe("POST", () => {
+    describe("happy path", () => {
+      test("auth and send token to valid credentials", async () => {
         const response = await api
           .post(LOGIN_URI)
           .send(rootUserData)
@@ -26,5 +26,47 @@ describe.only("LOGIN CONTROLLER", () => {
         assert.strictEqual(Object.prototype.hasOwnProperty.call(response.body, "token"), true);
       });
     });
+
+    describe("unhappy path", () => {
+      test("rejest with 400 given no username", async () => {
+        const request = { password: rootUserData.password };
+
+        await api
+          .post(LOGIN_URI)
+          .send(request)
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+      });
+
+      test("rejest with 400 given no password", async () => {
+        const request = { username: rootUserData.username };
+
+        await api
+          .post(LOGIN_URI)
+          .send(request)
+          .expect(400)
+          .expect("Content-Type", /application\/json/);
+      });
+
+      test("reject with 401 if no user was found with provided username", async () => {
+        const request = { username: "invalidusername", password: rootUserData.password };
+        await api
+          .post(LOGIN_URI)
+          .send(request)
+          .expect(401)
+          .expect("Content-Type", /application\/json/);
+      });
+
+      test("reject with 401 if password don't match", async () => {
+        const request = { username: rootUserData.username, password: "wrongpassword" };
+        await api
+          .post(LOGIN_URI)
+          .send(request)
+          .expect(401)
+          .expect("Content-Type", /application\/json/);
+      });
+    });
   });
 });
+
+after(() => mongoose.connection.close());
