@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
 const loginRouter = express.Router();
+const ONE_HOUR = 3600;
 
 loginRouter.post("/", async (request, response, next) => {
   const { username, password } = request.body;
@@ -30,7 +31,7 @@ loginRouter.post("/", async (request, response, next) => {
   };
 
   // @ts-ignore
-  const token = jwt.sign(dataForToken, process.env.JWT_SECRET);
+  const token = jwt.sign(dataForToken, process.env.JWT_SECRET, { expiresIn: ONE_HOUR });
 
   response.status(200).send({ token, username: user.username, name: user.name });
 });

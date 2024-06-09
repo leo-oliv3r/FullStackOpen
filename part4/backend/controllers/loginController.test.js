@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import { describe, test, after } from "node:test";
 import assert from "node:assert";
 import supertest from "supertest";
@@ -24,6 +25,35 @@ describe("LOGIN CONTROLLER", () => {
           .expect("Content-Type", /application\/json/);
 
         assert.strictEqual(Object.prototype.hasOwnProperty.call(response.body, "token"), true);
+      });
+
+      test("token has expiration property", async () => {
+        const response = await api
+          .post(LOGIN_URI)
+          .send(rootUserData)
+          .expect(200)
+          .expect("Content-Type", /application\/json/);
+
+        const decodedToken = jwt.decode(response.body.token);
+        assert.strictEqual(Object.prototype.hasOwnProperty.call(decodedToken, "exp"), true);
+      });
+
+      test("token have lifespan of one hour", async () => {
+        const response = await api
+          .post(LOGIN_URI)
+          .send(rootUserData)
+          .expect(200)
+          .expect("Content-Type", /application\/json/);
+
+        const decodedToken = jwt.decode(response.body.token);
+        // @ts-ignore
+        const issueDate = new Date(decodedToken.iat * 1000);
+        // @ts-ignore
+        const expirationDate = new Date(decodedToken.exp * 1000);
+        // @ts-ignore
+        const tokenExpiration = (expirationDate - issueDate) / 1000 / 60;
+
+        assert(tokenExpiration === 60);
       });
     });
 
