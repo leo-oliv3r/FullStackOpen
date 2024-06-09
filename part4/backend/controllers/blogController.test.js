@@ -1,5 +1,7 @@
+// @ts-nocheck
 import { beforeEach, describe, test, after } from "node:test";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import assert from "node:assert";
 import supertest from "supertest";
 import app from "../app.js";
@@ -89,13 +91,27 @@ describe("BLOG CONTROLLER", () => {
       author: "as",
     };
 
-    describe("/api/blogs", () => {
+    const rootUserData = {
+      username: "root",
+      password: "password123",
+    };
+
+    describe("/api/blogs", async () => {
+      // rootUser should allways be present
+      let validToken = null;
+
+      beforeEach(async () => {
+        const response = await api.post("/api/login").send(rootUserData).expect(200);
+        validToken = response.body.token;
+      });
+
       test("given valid input, correctly create blog with 201 response", async () => {
         const initialBlogs = await Blog.find({});
 
         await api
           .post(BLOGS_URI)
           .send(validInput)
+          .set("Authorization", `Bearer ${validToken}`)
           .expect(201)
           .expect("Content-Type", /application\/json/);
 
@@ -108,6 +124,7 @@ describe("BLOG CONTROLLER", () => {
         const response = await api
           .post(BLOGS_URI)
           .send(validInput)
+          .set("Authorization", `Bearer ${validToken}`)
           .expect(201)
           .expect("Content-Type", /application\/json/);
         const createdNote = response.body;
@@ -115,27 +132,55 @@ describe("BLOG CONTROLLER", () => {
       });
 
       test("correctly rejects given data that does not conform to schema", async () => {
-        const response = await api.post(BLOGS_URI).send(invalidInput).expect(400);
+        const response = await api
+          .post(BLOGS_URI)
+          .send(invalidInput)
+          .set("Authorization", `Bearer ${validToken}`)
+          .expect(400);
+
         assert(response.body.error.includes("validation failed"));
       });
 
-      // TODO Refactor once auth is implemented
-      test("correctly associate a blog created to first user", async () => {
-        const validUser = await User.findOne({});
+      test("correctly rejects given invalid token", async () => {
+        // @ts-ignore
+        const invalidToken = jwt.sign({}, process.env.JWT_SECRET);
 
-        if (!validUser) {
-          return;
-        }
+        await api
+          .post(BLOGS_URI)
+          .send(validInput)
+          .set("Authorization", `Bearer ${invalidToken}`)
+          .expect(401);
+      });
 
+      test("correctly rejects given valid token but user not found", async () => {
+        const validTokenWithInvalidUser = jwt.sign(
+          { username: "notRoot", id: generateValidMongooseId() },
+          process.env.JWT_SECRET
+        );
+
+        await api
+          .post(BLOGS_URI)
+          .send(validInput)
+          .set("Authorization", `Bearer ${validTokenWithInvalidUser}`)
+          .expect(404);
+      });
+
+      test("correctly associate a blog created to given user", async () => {
         const { body } = await api
           .post(BLOGS_URI)
           .send(validInput)
+          .set("Authorization", `Bearer ${validToken}`)
           .expect(201)
           .expect("Content-Type", /application\/json/);
 
         const createdBlog = body;
 
-        assert.deepStrictEqual(createdBlog.user, validUser.id);
+        const tokenPayload = jwt.decode(validToken);
+
+        // @ts-ignore
+        const userInToken = await User.findById(tokenPayload.id);
+
+        assert(userInToken?.blogs.map((blog) => blog.toString()).includes(createdBlog.id));
       });
     });
   });

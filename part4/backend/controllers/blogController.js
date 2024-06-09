@@ -1,5 +1,6 @@
 // @ts-nocheck
 import express from "express";
+import jwt from "jsonwebtoken";
 import Blog from "../models/blogModel.js";
 import User from "../models/userModel.js";
 
@@ -24,12 +25,32 @@ blogRouter.get("/", async (_, response, next) => {
 });
 
 blogRouter.post("/", async (request, response, next) => {
-  const { title, author, url } = request.body;
-  const validUser = await User.findOne({});
+  const authHeader = request.get("authorization");
+  if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
+    response.status(401).json({ error: "token missing or invalid" });
+    return;
+  }
 
-  const newBlog = new Blog({ title, author, url, user: validUser._id });
+  // extract token
+  const token = authHeader.substring(7);
+
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+  if (!decodedToken.id) {
+    response.status(401).json({ error: "invalid token" });
+    return;
+  }
+
+  const { title, author, url } = request.body;
+  const validUser = await User.findById(decodedToken.id);
+
+  if (!validUser) {
+    response.status(404).json({ error: "user not found" });
+    return;
+  }
 
   try {
+    const newBlog = new Blog({ title, author, url, user: validUser._id });
     const saveResponse = await newBlog.save();
     validUser.blogs = validUser.blogs.concat(saveResponse._id);
     await validUser.save();
