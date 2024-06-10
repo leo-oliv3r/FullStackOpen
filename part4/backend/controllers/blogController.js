@@ -4,6 +4,14 @@ import jwt from "jsonwebtoken";
 import Blog from "../models/blogModel.js";
 import User from "../models/userModel.js";
 
+function isTokenValid(decodedToken) {
+  if (!decodedToken.id) {
+    return false;
+  }
+
+  return true;
+}
+
 const blogRouter = express.Router();
 
 blogRouter.get("/:id", async (request, response, next) => {
@@ -33,7 +41,7 @@ blogRouter.post("/", async (request, response, next) => {
   // @ts-ignore
   const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
 
-  if (!decodedToken.id) {
+  if (!isTokenValid(decodedToken)) {
     response.status(401).json({ error: "invalid token" });
     return;
   }
@@ -42,7 +50,7 @@ blogRouter.post("/", async (request, response, next) => {
   const validUser = await User.findById(decodedToken.id);
 
   if (!validUser) {
-    response.status(404).json({ error: "user not found" });
+    response.status(404).json({ error: "no user found for provided token" });
     return;
   }
   const newBlog = new Blog({ title, author, url, user: validUser._id });
@@ -58,14 +66,44 @@ blogRouter.post("/", async (request, response, next) => {
 });
 
 blogRouter.delete("/:id", async (request, response, next) => {
+  if (!request.token) {
+    response.status(401).json({ error: "token missing or invalid" });
+    return;
+  }
+
+  const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+
+  if (!isTokenValid(decodedToken)) {
+    response.status(401).json({ error: "invalid token" });
+    return;
+  }
+
   try {
-    const deletedBlog = await Blog.findByIdAndDelete(request.params.id);
-    if (!deletedBlog) {
-      return response.status(404).end();
+    const userFromToken = await User.findById(decodedToken.id);
+    if (!userFromToken) {
+      response.status(404).json({ error: "no user found for provided token" });
+      return;
     }
-    return response.status(204).end();
+
+    const blogFound = await Blog.findById(request.params.id);
+    if (!blogFound) {
+      response.status(404).end();
+      return;
+    }
+
+    if (blogFound.user.toString() !== userFromToken._id.toString()) {
+      response.status(401).json({ error: "unauthorized to delete this blog" });
+      return;
+    }
+
+    await Blog.findByIdAndDelete(request.params.id);
+    userFromToken.blogs = userFromToken.blogs.filter(
+      (blog) => blog._id.toString() !== request.params.id
+    );
+    await userFromToken.save()
+    response.status(204).end();
   } catch (error) {
-    return next(error);
+    next(error);
   }
 });
 

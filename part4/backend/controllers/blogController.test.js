@@ -10,18 +10,50 @@ import User from "../models/userModel.js";
 
 const api = supertest(app);
 
+const rootUser = await User.findOne({});
+
 const initialBlogsData = [
-  { title: "Blog 1", author: "Author 1", url: "https://example.com/blog1", likes: 15 },
-  { title: "Blog 2", author: "Author 2", url: "https://example.com/blog2", likes: 10 },
-  { title: "Blog 3", author: "Author 3", url: "https://example.com/blog3", likes: 5 },
+  {
+    title: "Blog 1",
+    author: "Author 1",
+    url: "https://example.com/blog1",
+    likes: 15,
+    user: rootUser._id,
+  },
+  {
+    title: "Blog 2",
+    author: "Author 2",
+    url: "https://example.com/blog2",
+    likes: 10,
+    user: rootUser._id,
+  },
+  {
+    title: "Blog 3",
+    author: "Author 3",
+    url: "https://example.com/blog3",
+    likes: 5,
+    user: rootUser._id,
+  },
   {
     title: "Blog 4",
     author: "Author 4",
     url: "https://example.com/blog4",
     /* likes: 0 is default */
+    user: rootUser._id,
   },
-  { title: "Blog 5", author: "Author 5", url: "https://example.com/blog5", likes: 1 },
+  {
+    title: "Blog 5",
+    author: "Author 5",
+    url: "https://example.com/blog5",
+    likes: 1,
+    user: rootUser._id,
+  },
 ];
+
+const rootUserData = {
+  username: "root",
+  password: "password123",
+};
 
 const BLOGS_URI = "/api/blogs";
 
@@ -89,11 +121,6 @@ describe("BLOG CONTROLLER", () => {
     const invalidInput = {
       title: "ts",
       author: "as",
-    };
-
-    const rootUserData = {
-      username: "root",
-      password: "password123",
     };
 
     describe("/api/blogs", async () => {
@@ -186,12 +213,22 @@ describe("BLOG CONTROLLER", () => {
   });
 
   describe("DELETE", () => {
+    let validToken;
+
+    beforeEach(async () => {
+      const response = await api.post("/api/login").send(rootUserData).expect(200);
+      validToken = response.body.token;
+    });
+
     describe("api/blogs/:id", () => {
       test("given valid id, correctly delete blog", async () => {
         const blogsBeforeDelete = await Blog.find({});
-        const validId = blogsBeforeDelete[0].id;
+        const validId = blogsBeforeDelete[0]._id.toString();
 
-        await api.delete(`${BLOGS_URI}/${validId}`).expect(204);
+        await api
+          .delete(`${BLOGS_URI}/${validId}`)
+          .set("Authorization", `Bearer ${validToken}`)
+          .expect(204);
         const blogsAfterDelete = await Blog.find({});
 
         assert(blogsAfterDelete.length === blogsBeforeDelete.length - 1);
@@ -199,12 +236,23 @@ describe("BLOG CONTROLLER", () => {
 
       test("given valid id, but no blog found, return 404", async () => {
         const randomValidId = generateValidMongooseId();
-        await api.delete(`${BLOGS_URI}/${randomValidId}`).expect(404);
+        await api
+          .delete(`${BLOGS_URI}/${randomValidId}`)
+          .set("Authorization", `Bearer ${validToken}`)
+          .expect(404);
       });
 
       test("given invalid id return 400", async () => {
         const invalidId = "invalidId";
-        await api.delete(`${BLOGS_URI}/${invalidId}`).expect(400);
+        await api
+          .delete(`${BLOGS_URI}/${invalidId}`)
+          .set("Authorization", `Bearer ${validToken}`)
+          .expect(400);
+      });
+
+      test("reject a request without a token", async () => {
+        const validBlog = await Blog.findOne({});
+        await api.delete(`${BLOGS_URI}/${validBlog._id}`).expect(401);
       });
     });
   });
