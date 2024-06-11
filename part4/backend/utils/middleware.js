@@ -18,13 +18,40 @@ function tokenExtractor(request, _, next) {
     return;
   }
 
+  const token = authHeader.substring(7);
+
+  try {
+    // @ts-ignore
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken.id) {
+      throw new Error("invalid token");
+    }
+  } catch (error) {
+    next(error);
+    return;
+  }
+
   // Extracts jwt token from header
-  request.token = authHeader.substring(7);
+  request.token = token;
   next();
 }
 
 async function userExtractor(request, _, next) {
-  const tokenPayload = jwt.decode(request.token);
+  const { token } = request;
+
+  if (!token) {
+    next();
+    return;
+  }
+
+  let tokenPayload = null;
+  try {
+    // @ts-ignore
+    tokenPayload = jwt.verify(request.token, process.env.JWT_SECRET);
+  } catch (error) {
+    next(error);
+    return;
+  }
 
   // @ts-ignore
   const userFound = await User.findById(tokenPayload.id);
@@ -50,6 +77,9 @@ function errorHandler(error, _, response, next) {
   if (error.name === "ValidationError") {
     return response.status(400).json({ error: error.message });
   }
+  if (error.name === "JsonWebTokenError") {
+    return response.status(401).json({ error: error.message });
+  }
 
   if (error.message.includes("username and password must be provided")) {
     return response.status(400).json({ error: error.message });
@@ -60,7 +90,7 @@ function errorHandler(error, _, response, next) {
   }
 
   if (error.message.includes("no user found for provided token")) {
-    return response.status(401).json({ error: error.message });
+    return response.status(404).json({ error: error.message });
   }
 
   if (error.name === "MongoServerError" && error.message.includes("E11000 duplicate key error")) {
@@ -69,6 +99,14 @@ function errorHandler(error, _, response, next) {
 
   if (error.name === "TokenExpiredError") {
     return response.status(401).json({ error: "token expired" });
+  }
+
+  if (error.message.includes("token missing")) {
+    return response.status(401).json({ error: "token missing" });
+  }
+
+  if (error.message.includes("invalid token")) {
+    return response.status(401).json({ error: "invalid token" });
   }
 
   return next(error);

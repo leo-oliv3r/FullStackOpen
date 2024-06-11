@@ -4,14 +4,6 @@ import jwt from "jsonwebtoken";
 import Blog from "../models/blogModel.js";
 import User from "../models/userModel.js";
 
-function isTokenValid(decodedToken) {
-  if (!decodedToken.id) {
-    return false;
-  }
-
-  return true;
-}
-
 const blogRouter = express.Router();
 
 blogRouter.get("/:id", async (request, response, next) => {
@@ -34,15 +26,21 @@ blogRouter.get("/", async (_, response, next) => {
 
 blogRouter.post("/", async (request, response, next) => {
   if (!request.token) {
-    response.status(401).json({ error: "token missing or invalid" });
+    next(new Error("token missing"));
     return;
   }
 
   // @ts-ignore
-  const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+  let decodedToken = null;
+  try {
+    decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+  } catch (error) {
+    next(error);
+    return;
+  }
 
-  if (!isTokenValid(decodedToken)) {
-    response.status(401).json({ error: "invalid token" });
+  if (!decodedToken.id) {
+    next(new Error("invalid token"));
     return;
   }
 
@@ -67,14 +65,20 @@ blogRouter.post("/", async (request, response, next) => {
 
 blogRouter.delete("/:id", async (request, response, next) => {
   if (!request.token) {
-    response.status(401).json({ error: "token missing or invalid" });
+    next(new Error("token missing"));
     return;
   }
 
-  const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+  let decodedToken = null;
+  try {
+    decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+  } catch (error) {
+    next(error);
+    return;
+  }
 
-  if (!isTokenValid(decodedToken)) {
-    response.status(401).json({ error: "invalid token" });
+  if (!decodedToken.id) {
+    next(new Error("invalid token"));
     return;
   }
 
@@ -100,7 +104,7 @@ blogRouter.delete("/:id", async (request, response, next) => {
     userFromToken.blogs = userFromToken.blogs.filter(
       (blog) => blog._id.toString() !== request.params.id
     );
-    await userFromToken.save()
+    await userFromToken.save();
     response.status(204).end();
   } catch (error) {
     next(error);
