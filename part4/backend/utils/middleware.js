@@ -1,4 +1,6 @@
+import jwt from "jsonwebtoken";
 import logger from "./logger.js";
+import User from "../models/userModel.js";
 
 function requestLogger(request, _, next) {
   logger.info("Method:", request.method);
@@ -18,6 +20,20 @@ function tokenExtractor(request, _, next) {
 
   // Extracts jwt token from header
   request.token = authHeader.substring(7);
+  next();
+}
+
+async function userExtractor(request, _, next) {
+  const tokenPayload = jwt.decode(request.token);
+
+  // @ts-ignore
+  const userFound = await User.findById(tokenPayload.id);
+
+  if (!userFound) {
+    next(new Error("no user found for provided token"));
+  }
+
+  request.user = userFound;
   next();
 }
 
@@ -43,6 +59,10 @@ function errorHandler(error, _, response, next) {
     return response.status(400).json({ error: error.message });
   }
 
+  if (error.message.includes("no user found for provided token")) {
+    return response.status(401).json({ error: error.message });
+  }
+
   if (error.name === "MongoServerError" && error.message.includes("E11000 duplicate key error")) {
     return response.status(400).json({ error: "expected `username` to be unique" });
   }
@@ -54,4 +74,4 @@ function errorHandler(error, _, response, next) {
   return next(error);
 }
 
-export default { requestLogger, unknownEndpoint, errorHandler, tokenExtractor };
+export default { requestLogger, unknownEndpoint, errorHandler, tokenExtractor, userExtractor };
