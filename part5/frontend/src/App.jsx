@@ -9,6 +9,14 @@ function App() {
   const [userBlogs, setUserBlogs] = useState([]);
 
   useEffect(() => {
+    const localStorageUser = window.localStorage.getItem("loggedUser");
+    if (localStorageUser) {
+      const user = JSON.parse(localStorageUser);
+      setUser(user);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!user) return;
 
     blogService.getAllBlogs().then((allBlogs) => {
