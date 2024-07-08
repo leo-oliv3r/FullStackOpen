@@ -1,10 +1,9 @@
+import axios from "axios";
 const BLOGS_URI = "/api/blogs";
 
-// @todo verify this fetch, i believe it's wrong
 async function getAllBlogs() {
-  const response = await fetch(BLOGS_URI);
-  const data = await response.json();
-  return data;
+  const response = await axios.get(BLOGS_URI);
+  return response.data;
 }
 
 export default { getAllBlogs };
