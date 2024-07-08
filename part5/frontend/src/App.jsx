@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import blogService from "./services/blogService";
 import BlogList from "./components/BlogList";
 import LoginForm from "./components/LoginForm";
+import UserPanel from "./components/UserPanel";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -28,7 +29,7 @@ function App() {
   return (
     <>
       <h1>Blogs Archive</h1>
-      {user && <p>Welcome, {user.username}</p>}
+      {user && <UserPanel user={user} setUser={setUser} />}
       {user ? <BlogList blogs={userBlogs} /> : <LoginForm setUser={setUser} />}
     </>
   );
