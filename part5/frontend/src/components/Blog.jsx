@@ -1,10 +1,12 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 
-const Blog = ({ blog }) => (
-  <div>
-    {blog.title} {blog.author}
-  </div>
-);
+function Blog({ blog }) {
+  return (
+    <div>
+      <em>{blog.title}</em> - {blog.author}
+    </div>
+  );
+}
 
 export default Blog;
