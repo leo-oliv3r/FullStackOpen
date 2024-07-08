@@ -3,9 +3,9 @@ import React from "react";
 
 function Blog({ blog }) {
   return (
-    <div>
+    <li>
       <em>{blog.title}</em> - {blog.author}
-    </div>
+    </li>
   );
 }
 

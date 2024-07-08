@@ -9,10 +9,21 @@ function App() {
   const [userBlogs, setUserBlogs] = useState([]);
 
   useEffect(() => {
-    blogService.getAllBlogs().then((fetchedBlogs) => setUserBlogs(fetchedBlogs));
-  }, []);
+    if (!user) return;
 
-  return user ? <BlogList /> : <LoginForm />;
+    blogService.getAllBlogs().then((allBlogs) => {
+      const filteredBlogs = allBlogs.filter((blog) => blog.user.username === user.username);
+      setUserBlogs(filteredBlogs);
+    });
+  }, [user]);
+
+  return (
+    <>
+      <h1>Blogs Archive</h1>
+      {user && <p>Welcome, {user.username}</p>}
+      {user ? <BlogList blogs={userBlogs} /> : <LoginForm setUser={setUser} />}
+    </>
+  );
 }
 
 export default App;
