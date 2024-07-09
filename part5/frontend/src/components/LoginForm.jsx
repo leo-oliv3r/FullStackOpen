@@ -18,6 +18,7 @@ function LoginForm({ setUser }) {
 
     try {
       const user = await loginService.login({ username, password });
+      loginService.setCurrentUserToken(user.token);
       window.localStorage.setItem("loggedUser", JSON.stringify(user));
       setUser(user);
       setErrorMessage("");

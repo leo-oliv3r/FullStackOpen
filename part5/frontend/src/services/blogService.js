@@ -1,4 +1,6 @@
 import axios from "axios";
+import loginService from "./loginService";
+
 const BLOGS_URI = "/api/blogs";
 
 async function getAllBlogs() {
@@ -6,4 +8,21 @@ async function getAllBlogs() {
   return response.data;
 }
 
-export default { getAllBlogs };
+async function createBlog(title, author, url) {
+  const config = {
+    headers: {
+      Authorization: loginService.getCurrentUserToken(),
+    },
+  };
+
+  const blogData = {
+    title,
+    author,
+    url,
+  };
+
+  const response = await axios.post(BLOGS_URI, blogData, config);
+  return response.data;
+}
+
+export default { getAllBlogs, createBlog };

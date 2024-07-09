@@ -4,6 +4,7 @@ import blogService from "./services/blogService";
 import BlogList from "./components/BlogList";
 import LoginForm from "./components/LoginForm";
 import UserPanel from "./components/UserPanel";
+import BlogForm from "./components/BlogForm";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -30,6 +31,7 @@ function App() {
     <>
       <h1>Blogs Archive</h1>
       {user && <UserPanel user={user} setUser={setUser} />}
+      {user && <BlogForm setUsersBlog={setUserBlogs} />}
       {user ? <BlogList blogs={userBlogs} /> : <LoginForm setUser={setUser} />}
     </>
   );
